@@ -2,7 +2,7 @@
   "name": "api-rest-peliculas",
   "version": "1.0.0",
   "description": "Curso de consumo de API REST con JavaScript",
-  "main": "index.js",
+  "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,8 +10,9 @@
     "type": "git",
     "url": "git+https://github.com/zekt1209/API-REST-Peliculas.git"
   },
-  "author": "victorJG",
-  "license": "MIT",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/zekt1209/API-REST-Peliculas/issues"
   },
