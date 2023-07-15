@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "type":"module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zekt1209/API-REST-Peliculas.git"
@@ -16,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/zekt1209/API-REST-Peliculas/issues"
   },
-  "homepage": "https://github.com/zekt1209/API-REST-Peliculas#readme"
+  "homepage": "https://github.com/zekt1209/API-REST-Peliculas#readme",
+  "dependencies": {
+    "node-fetch": "^3.3.1"
+  }
 }
