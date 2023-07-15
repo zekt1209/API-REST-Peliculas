@@ -101,11 +101,11 @@ button {
   margin-bottom: 24px;
 }
 
-.movie-container {
+.movie-container, .serie-container{
   cursor: pointer;
 }
 
-.movie-img {
+.movie-img, .serie-img {
   border-radius: 8px;
 }
 
@@ -115,6 +115,10 @@ button {
   justify-content: space-between;
   position: relative;
   flex-wrap: wrap;
+}
+
+.trendingPreview-header__series {
+  margin-top: 20px;
 }
 
 
@@ -187,7 +191,10 @@ button {
   width: 72px;
 }
 
-.trendingPreview-movieList {
+                                /* Peliculas & Series container */
+
+.trendingPreview-movieList, 
+.trendingPreview-serieList {
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
@@ -196,12 +203,14 @@ button {
   padding-bottom: 16px;
 }
 
-.trendingPreview-movieList .movie-container {
+.trendingPreview-movieList .movie-container, 
+.trendingPreview-serieList .serie-container {
   display: inline-block;
   margin-right: 8px;
 }
 
-.trendingPreview-movieList .movie-container .movie-img {
+.trendingPreview-movieList .movie-container .movie-img, 
+.trendingPreview-serieList .serie-container .serie-img {
   height: 225px;
   min-height: 225px;
   max-height: 225px;
@@ -209,6 +218,7 @@ button {
   min-width: 150px;
   max-width: 150px;
 }
+
 
 
 /* Categories */
