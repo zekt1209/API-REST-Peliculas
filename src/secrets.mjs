@@ -1,8 +1,11 @@
 // Add it as a parameter
-export const API_KEY = '17b0beeb5b0f389cd983177de5c30a80';
-
+const API_KEY = '17b0beeb5b0f389cd983177de5c30a80';
+const ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxN2IwYmVlYjViMGYzODljZDk4MzE3N2RlNWMzMGE4MCIsInN1YiI6IjY0YjBkMWRlYmE0ODAyMDE0MzQ2NzQ1ZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.DdssNC1IcP38K7LzhbG9D5Hv3QeFVpE6rlAlN7obZlk';
 
 export default API_KEY;
+
+export {ACCESS_TOKEN};
+
 
 /*
 
