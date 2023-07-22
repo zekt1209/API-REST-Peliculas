@@ -1,6 +1,8 @@
 // import fetch from "node-fetch";
 import API_KEY, { ACCESS_TOKEN } from "./secrets.mjs";
 import navigation from "./navigation.mjs";
+import * as nodes from "./nodes.mjs";
+//import {num1} from './nodes.mjs';
 
 
 // const API_KEY = '17b0beeb5b0f389cd983177de5c30a80';
@@ -44,9 +46,9 @@ const axiosBearer = axios.create({
 //         const movies = data.results;
 
 //         // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
-//         const trendingMoviesArticleContainer = document.querySelector('#trendingPreview .trendingPreview-movieList');
+//         const trendingMoviesPreviewList = document.querySelector('#trendingPreview .trendingPreview-movieList');
 //         // Limpiamos el contenedor de peliculas
-//         //trendingMoviesArticleContainer.innerHTML = '';
+//         //trendingMoviesPreviewList.innerHTML = '';
 
 //         movies.forEach(movie => {
 
@@ -59,7 +61,7 @@ const axiosBearer = axios.create({
 //             movieImg.setAttribute('src', `${imgUrl}${movie.poster_path}`);
 
 //             movie_container.appendChild(movieImg);
-//             trendingMoviesArticleContainer.appendChild(movie_container);
+//             trendingMoviesPreviewList.appendChild(movie_container);
 //         });
 
 
@@ -89,9 +91,9 @@ const popularMovies = async () => {
         const movies = data.results;
 
         // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
-        const trendingMoviesArticleContainer = document.querySelector('#trendingPreview .trendingPreview-movieList');
+        const trendingMoviesPreviewList = document.querySelector('#trendingPreview .trendingPreview-movieList');
         // Limpiamos el contenedor de peliculas
-        //trendingMoviesArticleContainer.innerHTML = '';
+        //trendingMoviesPreviewList.innerHTML = '';
 
         movies.forEach(movie => {
 
@@ -104,7 +106,7 @@ const popularMovies = async () => {
             movieImg.setAttribute('src', `${imgUrl}${movie.poster_path}`);
 
             movie_container.appendChild(movieImg);
-            trendingMoviesArticleContainer.appendChild(movie_container);
+            trendingMoviesPreviewList.appendChild(movie_container);
         });
 
 
@@ -134,7 +136,7 @@ const popularMovies = async () => {
 //         // console.log(series.length);
 //         // console.log(series);
 
-//         const trendingPreview_serieList_Article = document.querySelector('#trendingPreview .trendingPreview-serieList');
+//         const trendingSeriePreviewList = document.querySelector('#trendingPreview .trendingPreview-serieList');
 
 //         series.forEach(serie => {
 //             const serie_container = document.createElement('div');
@@ -146,7 +148,7 @@ const popularMovies = async () => {
 //             serieImg.setAttribute('src', `${imgUrl}${serie.poster_path}`);
 
 //             serie_container.appendChild(serieImg);
-//             trendingPreview_serieList_Article.appendChild(serie_container);
+//             trendingSeriePreviewList.appendChild(serie_container);
 //         });
 
 //     } catch (error) {
@@ -167,7 +169,7 @@ const pupularSeries = async () => {
 
         const series = data.results;
 
-        const trendingPreview_serieList_Article = document.querySelector('#trendingPreview .trendingPreview-serieList');
+        const trendingSeriePreviewList = document.querySelector('#trendingPreview .trendingPreview-serieList');
 
         series.forEach(serie => {
             const serie_container = document.createElement('div');
@@ -179,7 +181,7 @@ const pupularSeries = async () => {
             serieImg.setAttribute('src', `${imgUrl}${serie.poster_path}`);
 
             serie_container.appendChild(serieImg);
-            trendingPreview_serieList_Article.appendChild(serie_container);
+            trendingSeriePreviewList.appendChild(serie_container);
         });
 
     } catch (error) {
@@ -219,7 +221,7 @@ const pupularSeries = async () => {
 //         // console.log(categories);
 
 //         const categoriesArray = [];
-//         const categoriesPreviewArticleContainer = document.querySelector('#categoriesPreview .categoriesPreview-list');
+//         const categoriesPreviewList = document.querySelector('#categoriesPreview .categoriesPreview-list');
 
 //         categories.forEach(category => {
 //             // console.log(category.name);
@@ -241,7 +243,7 @@ const pupularSeries = async () => {
 //         // console.log(finalCategoriesElement);
 
 
-//         categoriesPreviewArticleContainer.innerHTML = finalCategoriesElement;
+//         categoriesPreviewList.innerHTML = finalCategoriesElement;
 
 //     } catch (error) {
 //         errorSpan.innerText = "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " + error;
@@ -270,7 +272,7 @@ const movieCategories = async () => {
         // console.log(categories);
 
         const categoriesArray = [];
-        const categoriesPreviewArticleContainer = document.querySelector('#categoriesPreview .categoriesPreview-list');
+        const categoriesPreviewList = document.querySelector('#categoriesPreview .categoriesPreview-list');
 
         categories.forEach(category => {
             // console.log(category.name);
@@ -292,12 +294,12 @@ const movieCategories = async () => {
         // console.log(finalCategoriesElement);
 
 
-        categoriesPreviewArticleContainer.innerHTML = finalCategoriesElement;
+        categoriesPreviewList.innerHTML = finalCategoriesElement;
 
     } catch (error) {
         errorSpan.innerText = "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " + error;
         console.warn("Error toJSON(): ");
-        console.error(error.toJSON());
+        //console.error(error.toJSON());
     }
 
 }
@@ -314,6 +316,8 @@ const movieCategories = async () => {
 // popularMovies();
 // pupularSeries();
 // movieCategories();
+
+
 
 export {popularMovies, pupularSeries, movieCategories};
 
