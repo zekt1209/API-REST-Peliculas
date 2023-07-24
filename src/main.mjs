@@ -4,28 +4,26 @@ import navigation from "./navigation.mjs";
 import * as nodes from "./nodes.mjs";
 //import {num1} from './nodes.mjs';
 
-
 // const API_KEY = '17b0beeb5b0f389cd983177de5c30a80';
-const API_URL = 'https://api.themoviedb.org/3'; 
-const imgUrl = 'http://image.tmdb.org/t/p/w300';
-const errorSpan = document.querySelector('.errorSpan');
+const API_URL = "https://api.themoviedb.org/3";
+const imgUrl = "http://image.tmdb.org/t/p/w300";
+const errorSpan = document.querySelector(".errorSpan");
 
 // Migracion a Axios
 const api = axios.create({
-    baseURL: 'https://api.themoviedb.org/3',
-    headers: {'Content-Type': 'application/json;charset=utf-8'},
-    params: {'api_key': API_KEY}
+    baseURL: "https://api.themoviedb.org/3",
+    headers: { "Content-Type": "application/json;charset=utf-8" },
+    params: { api_key: API_KEY },
 });
 
 const axiosBearer = axios.create({
-    method: 'get',
-    baseURL: 'https://api.themoviedb.org/3',
-    headers: {'Content-Type': 'application/json;charset=utf-8,',
-                'Authorization': "Bearer " + ACCESS_TOKEN,},
-    
+    method: "get",
+    baseURL: "https://api.themoviedb.org/3",
+    headers: {
+        "Content-Type": "application/json;charset=utf-8,",
+        Authorization: "Bearer " + ACCESS_TOKEN,
+    },
 });
-
-
 
 // *** GET para obtener las peliculas en Tendencia ***
 
@@ -36,19 +34,19 @@ const axiosBearer = axios.create({
 
 //         if (response.status != "200") {
 //             console.error("Error en status de response de la funcion popularMovies, status: " + response.status);
-//         } 
+//         }
 
 //         const data = await response.json()
-    
+
 //         //console.log(data.results.length);
 //         //console.log(data.results);
 
 //         const movies = data.results;
 
 //         // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
-//         const trendingMoviesPreviewList = document.querySelector('#trendingPreview .trendingPreview-movieList');
+//         const nodes.trendingMoviesPreviewList = document.querySelector('#trendingPreview .trendingPreview-movieList');
 //         // Limpiamos el contenedor de peliculas
-//         //trendingMoviesPreviewList.innerHTML = '';
+//         //nodes.trendingMoviesPreviewList.innerHTML = '';
 
 //         movies.forEach(movie => {
 
@@ -61,10 +59,8 @@ const axiosBearer = axios.create({
 //             movieImg.setAttribute('src', `${imgUrl}${movie.poster_path}`);
 
 //             movie_container.appendChild(movieImg);
-//             trendingMoviesPreviewList.appendChild(movie_container);
+//             nodes.trendingMoviesPreviewList.appendChild(movie_container);
 //         });
-
-
 
 //     } catch (error) {
 //         errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
@@ -75,11 +71,15 @@ const axiosBearer = axios.create({
 // --- Axios ---
 const popularMovies = async () => {
     try {
-        const {data, status, statusText, headers, config, request} = await api(`/trending/movie/day?language=es`);
+        const { data, status, statusText, headers, config, request } =
+            await api(`/trending/movie/day?language=es`);
 
         if (status != "200") {
-            console.error("Error en status de response de la funcion popularMovies, status: " + status);
-        } 
+            console.error(
+                "Error en status de response de la funcion popularMovies, status: " +
+                    status
+            );
+        }
 
         // console.log(data);
         // console.log(status);
@@ -91,34 +91,32 @@ const popularMovies = async () => {
         const movies = data.results;
 
         // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
-        const trendingMoviesPreviewList = document.querySelector('#trendingPreview .trendingPreview-movieList');
+        nodes.trendingMoviesPreviewList.innerHTML = "";
+
         // Limpiamos el contenedor de peliculas
-        //trendingMoviesPreviewList.innerHTML = '';
+        //nodes.trendingMoviesPreviewList.innerHTML = '';
 
-        movies.forEach(movie => {
+        movies.forEach((movie) => {
+            const movie_container = document.createElement("div");
+            movie_container.classList.add("movie-container");
 
-            const movie_container = document.createElement('div');
-            movie_container.classList.add('movie-container');
-
-            const movieImg = document.createElement('img');
-            movieImg.classList.add('movie-img');
-            movieImg.setAttribute('alt', movie.original_title);
-            movieImg.setAttribute('src', `${imgUrl}${movie.poster_path}`);
+            const movieImg = document.createElement("img");
+            movieImg.classList.add("movie-img");
+            movieImg.setAttribute("alt", movie.original_title);
+            movieImg.setAttribute("src", `${imgUrl}${movie.poster_path}`);
 
             movie_container.appendChild(movieImg);
-            trendingMoviesPreviewList.appendChild(movie_container);
+            nodes.trendingMoviesPreviewList.appendChild(movie_container);
         });
-
-
-
     } catch (error) {
-        errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
+        errorSpan.innerText =
+            "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " +
+            error;
         console.log(error);
     }
-}
+};
 
-
-                        // GET para obtener las series en Tendencia
+// GET para obtener las series en Tendencia
 
 // --- Fetch ---
 // const pupularSeries = async (apiUrl) => {
@@ -136,7 +134,7 @@ const popularMovies = async () => {
 //         // console.log(series.length);
 //         // console.log(series);
 
-//         const trendingSeriePreviewList = document.querySelector('#trendingPreview .trendingPreview-serieList');
+//         const nodes.trendingSeriePreviewList = document.querySelector('#trendingPreview .trendingPreview-serieList');
 
 //         series.forEach(serie => {
 //             const serie_container = document.createElement('div');
@@ -148,7 +146,7 @@ const popularMovies = async () => {
 //             serieImg.setAttribute('src', `${imgUrl}${serie.poster_path}`);
 
 //             serie_container.appendChild(serieImg);
-//             trendingSeriePreviewList.appendChild(serie_container);
+//             nodes.trendingSeriePreviewList.appendChild(serie_container);
 //         });
 
 //     } catch (error) {
@@ -160,38 +158,40 @@ const popularMovies = async () => {
 // --- Axios ---
 const pupularSeries = async () => {
     try {
-        const {data, status} = await api(`/trending/tv/day?language=es`);
+        const { data, status } = await api(`/trending/tv/day?language=es`);
 
         if (status != "200") {
-            console.log("Error en status de peticion de la funcion pupularSeries, status: " + status);
+            console.log(
+                "Error en status de peticion de la funcion pupularSeries, status: " +
+                    status
+            );
         }
-
 
         const series = data.results;
 
-        const trendingSeriePreviewList = document.querySelector('#trendingPreview .trendingPreview-serieList');
+        nodes.trendingSeriePreviewList.innerHTML = "";
 
-        series.forEach(serie => {
-            const serie_container = document.createElement('div');
-            serie_container.classList.add('serie-container');
+        series.forEach((serie) => {
+            const serie_container = document.createElement("div");
+            serie_container.classList.add("serie-container");
 
-            const serieImg = document.createElement('img');
-            serieImg.classList.add('serie-img');
-            serieImg.setAttribute('alt', serie.original_name);
-            serieImg.setAttribute('src', `${imgUrl}${serie.poster_path}`);
+            const serieImg = document.createElement("img");
+            serieImg.classList.add("serie-img");
+            serieImg.setAttribute("alt", serie.original_name);
+            serieImg.setAttribute("src", `${imgUrl}${serie.poster_path}`);
 
             serie_container.appendChild(serieImg);
-            trendingSeriePreviewList.appendChild(serie_container);
+            nodes.trendingSeriePreviewList.appendChild(serie_container);
         });
-
     } catch (error) {
-        errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
+        errorSpan.innerText =
+            "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " +
+            error;
         console.log("Error en funcion pupularSeries: " + error);
     }
-}
+};
 
-
-                        // GET para obtener las series en Tendencia
+// GET para obtener las series en Tendencia
 
 // --- Fetch ---
 // const movieCategories = async (apiUrl) => {
@@ -204,19 +204,18 @@ const pupularSeries = async () => {
 //                 'Authorization': "Bearer " + ACCESS_TOKEN,
 //             }
 //         })
-    
+
 //         // Operador terneario para validar el status de la peticion
-//         // res.status != "200" 
-//         // ? console.log("Error en el status en la funcion movieCategories, status: " + res.status) 
+//         // res.status != "200"
+//         // ? console.log("Error en el status en la funcion movieCategories, status: " + res.status)
 //         // : console.log("todo chido con el status en movieCategories, status: " + res.status);
 
 //         if (res.status != "200") {
 //             console.log("Error en el status en la funcion movieCategories, status: " + res.status)
 //         }
-    
+
 //         const data = await res.json();
-    
-        
+
 //         const categories = data.genres;
 //         // console.log(categories);
 
@@ -225,7 +224,6 @@ const pupularSeries = async () => {
 
 //         categories.forEach(category => {
 //             // console.log(category.name);
-
 
 //             const categoryItem = `
 //             <div class="category-container">
@@ -242,7 +240,6 @@ const pupularSeries = async () => {
 
 //         // console.log(finalCategoriesElement);
 
-
 //         categoriesPreviewList.innerHTML = finalCategoriesElement;
 
 //     } catch (error) {
@@ -251,60 +248,62 @@ const pupularSeries = async () => {
 //     }
 
 // }
-
 // --- Axios ---
 const movieCategories = async () => {
     try {
+        const { data, status } = await axiosBearer(
+            `/genre/movie/list?language=es`
+        );
 
-        const {data, status} = await axiosBearer(`/genre/movie/list?language=es`);
-    
         // Operador terneario para validar el status de la peticion
-        // res.status != "200" 
-        // ? console.log("Error en el status en la funcion movieCategories, status: " + res.status) 
+        // res.status != "200"
+        // ? console.log("Error en el status en la funcion movieCategories, status: " + res.status)
         // : console.log("todo chido con el status en movieCategories, status: " + res.status);
 
         if (status != "200") {
-            console.log("Error en el status en la funcion movieCategories, status: " + status)
+            console.log(
+                "Error en el status en la funcion movieCategories, status: " +
+                    status
+            );
         }
-    
-        
+
         const categories = data.genres;
         // console.log(categories);
 
         const categoriesArray = [];
-        const categoriesPreviewList = document.querySelector('#categoriesPreview .categoriesPreview-list');
+        const categoriesPreviewList = document.querySelector(
+            "#categoriesPreview .categoriesPreview-list"
+        );
 
-        categories.forEach(category => {
+        categories.forEach((category) => {
             // console.log(category.name);
-
 
             const categoryItem = `
             <div class="category-container">
-            <h3 id="${"id"+category.id}" class="category-title">${category.name}</h3>
+            <h3 id="${"id" + category.id}" class="category-title">${
+                category.name
+            }</h3>
           </div>
-            `
+            `;
 
             categoriesArray.push(categoryItem);
-        })
+        });
 
         // console.log(categoriesArray);
 
-        const finalCategoriesElement = categoriesArray.join('');
+        const finalCategoriesElement = categoriesArray.join("");
 
         // console.log(finalCategoriesElement);
 
-
         categoriesPreviewList.innerHTML = finalCategoriesElement;
-
     } catch (error) {
-        errorSpan.innerText = "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " + error;
+        errorSpan.innerText =
+            "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " +
+            error;
         console.warn("Error toJSON(): ");
         //console.error(error.toJSON());
     }
-
-}
-
-
+};
 
 // --- Fetch ---
 // popularMovies(API_URL);
@@ -317,11 +316,4 @@ const movieCategories = async () => {
 // pupularSeries();
 // movieCategories();
 
-
-
-export {popularMovies, pupularSeries, movieCategories};
-
-
-
-
-
+export { popularMovies, pupularSeries, movieCategories };
