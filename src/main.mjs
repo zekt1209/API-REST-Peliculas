@@ -317,3 +317,5 @@ const movieCategories = async () => {
 // movieCategories();
 
 export { popularMovies, pupularSeries, movieCategories };
+
+// Test comment git
