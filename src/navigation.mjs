@@ -1,6 +1,8 @@
 import { popularMovies, pupularSeries, movieCategories } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
 
+// Eventos que manipulan al DOM para la navegacion
+
 nodes.searchFormBtn.addEventListener("click", () => {
     location.hash = "#search=";
 });
@@ -12,6 +14,8 @@ nodes.trendingBtn.addEventListener("click", () => {
 nodes.arrowBtn.addEventListener("click", () => {
     location.hash = "#home";
 });
+
+// Eventos para manipular el DOM al cargar y al cambiar de hash
 
 window.addEventListener("DOMContentLoaded", navigation, false);
 window.addEventListener("hashchange", navigation, false);

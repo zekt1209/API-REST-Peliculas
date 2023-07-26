@@ -71,14 +71,10 @@ const axiosBearer = axios.create({
 // --- Axios ---
 const popularMovies = async () => {
     try {
-        const { data, status, statusText, headers, config, request } =
-            await api(`/trending/movie/day?language=es`);
+        const { data, status, statusText, headers, config, request } = await api(`/trending/movie/day?language=es`);
 
         if (status != "200") {
-            console.error(
-                "Error en status de response de la funcion popularMovies, status: " +
-                    status
-            );
+            console.error("Error en status de response de la funcion popularMovies, status: " + status);
         }
 
         // console.log(data);
@@ -109,9 +105,7 @@ const popularMovies = async () => {
             nodes.trendingMoviesPreviewList.appendChild(movie_container);
         });
     } catch (error) {
-        errorSpan.innerText =
-            "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " +
-            error;
+        errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
         console.log(error);
     }
 };
@@ -161,10 +155,7 @@ const pupularSeries = async () => {
         const { data, status } = await api(`/trending/tv/day?language=es`);
 
         if (status != "200") {
-            console.log(
-                "Error en status de peticion de la funcion pupularSeries, status: " +
-                    status
-            );
+            console.log("Error en status de peticion de la funcion pupularSeries, status: " + status);
         }
 
         const series = data.results;
@@ -184,9 +175,7 @@ const pupularSeries = async () => {
             nodes.trendingSeriePreviewList.appendChild(serie_container);
         });
     } catch (error) {
-        errorSpan.innerText =
-            "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " +
-            error;
+        errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
         console.log("Error en funcion pupularSeries: " + error);
     }
 };
@@ -251,9 +240,7 @@ const pupularSeries = async () => {
 // --- Axios ---
 const movieCategories = async () => {
     try {
-        const { data, status } = await axiosBearer(
-            `/genre/movie/list?language=es`
-        );
+        const { data, status } = await axiosBearer(`/genre/movie/list?language=es`);
 
         // Operador terneario para validar el status de la peticion
         // res.status != "200"
@@ -261,45 +248,58 @@ const movieCategories = async () => {
         // : console.log("todo chido con el status en movieCategories, status: " + res.status);
 
         if (status != "200") {
-            console.log(
-                "Error en el status en la funcion movieCategories, status: " +
-                    status
-            );
+            console.log("Error en el status en la funcion movieCategories, status: " + status);
         }
 
         const categories = data.genres;
         // console.log(categories);
 
         const categoriesArray = [];
-        const categoriesPreviewList = document.querySelector(
-            "#categoriesPreview .categoriesPreview-list"
-        );
+        const categoriesPreviewList = document.querySelector("#categoriesPreview .categoriesPreview-list");
 
         categories.forEach((category) => {
             // console.log(category.name);
 
+            const categoryId = category.id;
+            const categoryName = category.name;
+
+            const hash = `#category=${categoryId}-${categoryName}`;
+            /*
             const categoryItem = `
             <div class="category-container">
-            <h3 id="${"id" + category.id}" class="category-title">${
-                category.name
-            }</h3>
-          </div>
+            <h3 id="${"id" + category.id}" class="category-title">${category.name}</h3>
+            </div>
             `;
 
             categoriesArray.push(categoryItem);
+            */
+            categoriesPreviewList.insertAdjacentHTML(
+                "beforeend",
+                `
+            <div class="category-container">
+            <h3 id="id${category.id}" class="category-title">${category.name}</h3>
+            </div>
+            `
+            );
+
+            // Event that calls the function to load movies by category
+            const categoryTitle = document.querySelector(`#id${categoryId}`);
+            categoryTitle.addEventListener("click", () => {
+                console.log("Hello World");
+                console.log(category.id + " " + category.name);
+                location.hash = hash;
+            });
         });
 
         // console.log(categoriesArray);
 
-        const finalCategoriesElement = categoriesArray.join("");
+        //const finalCategoriesElement = categoriesArray.join("");
 
         // console.log(finalCategoriesElement);
 
-        categoriesPreviewList.innerHTML = finalCategoriesElement;
+        //categoriesPreviewList.innerHTML = finalCategoriesElement;
     } catch (error) {
-        errorSpan.innerText =
-            "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " +
-            error;
+        errorSpan.innerText = "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " + error;
         console.warn("Error toJSON(): ");
         //console.error(error.toJSON());
     }

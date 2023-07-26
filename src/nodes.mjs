@@ -46,4 +46,3 @@ export const movieDetailScore = document.querySelector(".movieDetail-score");
 let num1 = 5;
 
 export { num1 };
-8;
