@@ -257,6 +257,8 @@ const movieCategories = async () => {
         const categoriesArray = [];
         const categoriesPreviewList = document.querySelector("#categoriesPreview .categoriesPreview-list");
 
+        categoriesPreviewList.innerHTML = "";
+
         categories.forEach((category) => {
             // console.log(category.name);
 
