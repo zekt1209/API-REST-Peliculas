@@ -1,4 +1,4 @@
-import { popularMovies, pupularSeries, movieCategories } from "./main.mjs";
+import { popularMovies, pupularSeries, movieCategories, getMoviesByCategory } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
 
 // Eventos que manipulan al DOM para la navegacion
@@ -123,6 +123,19 @@ const categoryPage = () => {
     nodes.categoriesPreviewSection.classList.add("inactive");
     nodes.genericSection.classList.remove("inactive");
     nodes.movieDetailSection.classList.add("inactive");
+
+    // #category=27-Terror
+    const pageHash = location.hash.split("=");
+    // ['#category', '27-Terror']
+    const hashContent = pageHash[1].split("-");
+    // ['27', 'Terror']
+    const categoryId = hashContent[0];
+
+    console.log(pageHash);
+    console.log(hashContent);
+    console.log(categoryId);
+
+    getMoviesByCategory(categoryId);
 };
 
 // navigation();

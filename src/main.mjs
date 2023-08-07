@@ -13,7 +13,7 @@ const errorSpan = document.querySelector(".errorSpan");
 const api = axios.create({
     baseURL: "https://api.themoviedb.org/3",
     headers: { "Content-Type": "application/json;charset=utf-8" },
-    params: { api_key: API_KEY },
+    params: { api_key: API_KEY, language: "es-MX" },
 });
 
 const axiosBearer = axios.create({
@@ -307,6 +307,31 @@ const movieCategories = async () => {
     }
 };
 
+const getMoviesByCategory = async (id) => {
+    try {
+        let { data, status } = await api("/discover/movie", {
+            params: {
+                with_genres: id,
+            },
+        });
+
+        if ((status = !200)) {
+            console.log("Error en status de peticion, status: " + status);
+        }
+
+        const movies = data.results;
+
+        movies.forEach((movie) => {
+            console.log(movie.original_title);
+        });
+
+        console.log(data.results);
+    } catch (error) {
+        console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
+        errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
+    }
+};
+
 // --- Fetch ---
 // popularMovies(API_URL);
 // pupularSeries(API_URL);
@@ -318,6 +343,6 @@ const movieCategories = async () => {
 // pupularSeries();
 // movieCategories();
 
-export { popularMovies, pupularSeries, movieCategories };
+export { popularMovies, pupularSeries, movieCategories, getMoviesByCategory };
 
 // Test comment git
