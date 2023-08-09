@@ -240,7 +240,11 @@ const pupularSeries = async () => {
 // --- Axios ---
 const movieCategories = async () => {
     try {
-        const { data, status } = await axiosBearer(`/genre/movie/list?language=es`);
+        const { data, status } = await axiosBearer(`/genre/movie/list`, {
+            params: {
+                language: 'es-MX',
+            }
+        });
 
         // Operador terneario para validar el status de la peticion
         // res.status != "200"
@@ -312,6 +316,7 @@ const getMoviesByCategory = async (id) => {
         let { data, status } = await api("/discover/movie", {
             params: {
                 with_genres: id,
+                language: 'es-MX',
             },
         });
 
@@ -321,8 +326,23 @@ const getMoviesByCategory = async (id) => {
 
         const movies = data.results;
 
+        // Seleccionamos y limpiamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
+        nodes.genericSection.innerHTML = "";
+
         movies.forEach((movie) => {
-            console.log(movie.original_title);
+            console.log("Titulo de la pelicula: " + movie.original_title);
+
+            const movie_container = document.createElement("div");
+            movie_container.classList.add("movie-container");
+
+            const movieImg = document.createElement("img");
+            movieImg.classList.add("movie-img");
+            movieImg.setAttribute("alt", movie.original_title);
+            movieImg.setAttribute("src", `${imgUrl}${movie.poster_path}`);
+
+            movie_container.appendChild(movieImg);
+            nodes.genericSection.appendChild(movie_container);
+            
         });
 
         console.log(data.results);

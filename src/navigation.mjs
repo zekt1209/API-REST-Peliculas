@@ -130,10 +130,13 @@ const categoryPage = () => {
     const hashContent = pageHash[1].split("-");
     // ['27', 'Terror']
     const categoryId = hashContent[0];
+    const categoryTitle = hashContent[1];
 
     console.log(pageHash);
     console.log(hashContent);
     console.log(categoryId);
+
+    nodes.headerCategoryTitle.innerHTML = categoryTitle;
 
     getMoviesByCategory(categoryId);
 };
