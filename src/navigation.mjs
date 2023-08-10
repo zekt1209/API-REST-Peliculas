@@ -130,7 +130,7 @@ const categoryPage = () => {
     const hashContent = pageHash[1].split("-");
     // ['27', 'Terror']
     const categoryId = hashContent[0];
-    const categoryTitle = hashContent[1];
+    const categoryTitle = decodeURI(hashContent[1]);
 
     console.log(pageHash);
     console.log(hashContent);
