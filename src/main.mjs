@@ -25,6 +25,33 @@ const axiosBearer = axios.create({
     },
 });
 
+// Utils
+
+const createMovies = (parentContainer, dataResultArray) => {
+        // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
+        parentContainer.innerHTML = "";
+
+        // Limpiamos el contenedor de peliculas
+        //nodes.trendingMoviesPreviewList.innerHTML = '';
+
+        dataResultArray.forEach((movie) => {
+            const movie_container = document.createElement("div");
+            movie_container.classList.add("movie-container");
+
+            const movieImg = document.createElement("img");
+            movieImg.classList.add("movie-img");
+            movieImg.setAttribute("alt", movie.original_title);
+            movieImg.setAttribute("src", `${imgUrl}${movie.poster_path}`);
+
+            movie_container.appendChild(movieImg);
+            parentContainer.appendChild(movie_container);
+        });
+}
+
+
+
+// Llamados a la API
+
 // *** GET para obtener las peliculas en Tendencia ***
 
 // --- Fetch ---
@@ -86,24 +113,7 @@ const popularMovies = async () => {
 
         const movies = data.results;
 
-        // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
-        nodes.trendingMoviesPreviewList.innerHTML = "";
-
-        // Limpiamos el contenedor de peliculas
-        //nodes.trendingMoviesPreviewList.innerHTML = '';
-
-        movies.forEach((movie) => {
-            const movie_container = document.createElement("div");
-            movie_container.classList.add("movie-container");
-
-            const movieImg = document.createElement("img");
-            movieImg.classList.add("movie-img");
-            movieImg.setAttribute("alt", movie.original_title);
-            movieImg.setAttribute("src", `${imgUrl}${movie.poster_path}`);
-
-            movie_container.appendChild(movieImg);
-            nodes.trendingMoviesPreviewList.appendChild(movie_container);
-        });
+        createMovies(nodes.trendingMoviesPreviewList, movies);
     } catch (error) {
         errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
         console.log(error);
@@ -158,7 +168,7 @@ const pupularSeries = async () => {
             console.log("Error en status de peticion de la funcion pupularSeries, status: " + status);
         }
 
-        const series = data.results;
+        const series = data.results;        
 
         nodes.trendingSeriePreviewList.innerHTML = "";
 
@@ -174,6 +184,7 @@ const pupularSeries = async () => {
             serie_container.appendChild(serieImg);
             nodes.trendingSeriePreviewList.appendChild(serie_container);
         });
+
     } catch (error) {
         errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
         console.log("Error en funcion pupularSeries: " + error);
@@ -258,27 +269,19 @@ const movieCategories = async () => {
         const categories = data.genres;
         // console.log(categories);
 
-        const categoriesArray = [];
         const categoriesPreviewList = document.querySelector("#categoriesPreview .categoriesPreview-list");
+
+
 
         categoriesPreviewList.innerHTML = "";
 
         categories.forEach((category) => {
-            // console.log(category.name);
 
             const categoryId = category.id;
             const categoryName = category.name;
 
             const hash = `#category=${categoryId}-${categoryName}`;
-            /*
-            const categoryItem = `
-            <div class="category-container">
-            <h3 id="${"id" + category.id}" class="category-title">${category.name}</h3>
-            </div>
-            `;
 
-            categoriesArray.push(categoryItem);
-            */
             categoriesPreviewList.insertAdjacentHTML(
                 "beforeend",
                 `
@@ -291,7 +294,6 @@ const movieCategories = async () => {
             // Event that calls the function to load movies by category
             const categoryTitle = document.querySelector(`#id${categoryId}`);
             categoryTitle.addEventListener("click", () => {
-                console.log("Hello World");
                 console.log(category.id + " " + category.name);
                 location.hash = hash;
             });
@@ -326,31 +328,40 @@ const getMoviesByCategory = async (id) => {
 
         const movies = data.results;
 
-        // Seleccionamos y limpiamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
-        nodes.genericSection.innerHTML = "";
-
-        movies.forEach((movie) => {
-            console.log("Titulo de la pelicula: " + movie.original_title);
-
-            const movie_container = document.createElement("div");
-            movie_container.classList.add("movie-container");
-
-            const movieImg = document.createElement("img");
-            movieImg.classList.add("movie-img");
-            movieImg.setAttribute("alt", movie.original_title);
-            movieImg.setAttribute("src", `${imgUrl}${movie.poster_path}`);
-
-            movie_container.appendChild(movieImg);
-            nodes.genericSection.appendChild(movie_container);
-            
-        });
-
+        createMovies(nodes.genericSection, movies);
+        
         console.log(data.results);
     } catch (error) {
         console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
         errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
     }
 };
+
+const getMoviesBySearch = async (query) => {
+    try {
+        let { data, status } = await api("/search/movie", {
+            params: {
+                query,
+                language: 'es-MX',
+            },
+        });
+
+        if ((status = !200)) {
+            console.log("Error en status de peticion, status: " + status);
+        }
+
+        const movies = data.results;
+
+        createMovies(nodes.genericSection, movies);
+        
+        console.log(data.results);
+    } catch (error) {
+        console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
+        errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
+    }
+}
+
+
 
 // --- Fetch ---
 // popularMovies(API_URL);
@@ -363,6 +374,6 @@ const getMoviesByCategory = async (id) => {
 // pupularSeries();
 // movieCategories();
 
-export { popularMovies, pupularSeries, movieCategories, getMoviesByCategory };
+export { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch };
 
 // Test comment git

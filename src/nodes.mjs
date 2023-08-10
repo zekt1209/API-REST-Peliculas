@@ -1,3 +1,4 @@
+export const body = document.querySelector('#body');
 // Sections
 export const headerSection = document.querySelector("#header");
 export const trendingPreviewSection =

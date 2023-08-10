@@ -1,10 +1,10 @@
-import { popularMovies, pupularSeries, movieCategories, getMoviesByCategory } from "./main.mjs";
+import { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
 
 // Eventos que manipulan al DOM para la navegacion
 
 nodes.searchFormBtn.addEventListener("click", () => {
-    location.hash = "#search=";
+    location.hash = "#search=" + nodes.searchFormInput.value;
 });
 
 nodes.trendingBtn.addEventListener("click", () => {
@@ -87,6 +87,13 @@ const searchPage = () => {
     nodes.categoriesPreviewSection.classList.add("inactive");
     nodes.genericSection.classList.remove("inactive");
     nodes.movieDetailSection.classList.add("inactive");
+
+        // #search=Spiderman
+    const pageHash = location.hash.split("=");
+    // ['#search', 'Spiderman']
+    const query = pageHash[1];
+
+    getMoviesBySearch(query);
 };
 
 const moviePage = () => {
@@ -110,6 +117,7 @@ const moviePage = () => {
 
 const categoryPage = () => {
     console.log("Categories!");
+    window.scrollTo(0,0);
 
     nodes.headerSection.classList.remove("header-container--long");
     nodes.headerSection.style.background = "";
