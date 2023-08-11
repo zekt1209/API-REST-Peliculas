@@ -1,6 +1,11 @@
 import { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
 
+// Eventos para manipular el DOM al cargar y al cambiar de hash
+
+window.addEventListener("DOMContentLoaded", navigation, false);
+window.addEventListener("hashchange", navigation, false);
+
 // Eventos que manipulan al DOM para la navegacion
 
 nodes.searchFormBtn.addEventListener("click", () => {
@@ -12,13 +17,10 @@ nodes.trendingBtn.addEventListener("click", () => {
 });
 
 nodes.arrowBtn.addEventListener("click", () => {
-    location.hash = "#home";
+    console.log("Click arrow button");
+    window.history.back();
 });
 
-// Eventos para manipular el DOM al cargar y al cambiar de hash
-
-window.addEventListener("DOMContentLoaded", navigation, false);
-window.addEventListener("hashchange", navigation, false);
 
 export default function navigation() {
     // console.log ({location});
@@ -93,6 +95,8 @@ const searchPage = () => {
     // ['#search', 'Spiderman']
     const query = pageHash[1];
 
+    // Le ponemos el titulo buscado
+    nodes.headerCategoryTitle.innerHTML = "Se muestran resultados de: " + decodeURI(query);
     getMoviesBySearch(query);
 };
 

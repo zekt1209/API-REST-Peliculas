@@ -352,7 +352,13 @@ const getMoviesBySearch = async (query) => {
 
         const movies = data.results;
 
+        // Checamos si no se encontro ningun resultado
+        if (movies.length == 0) {
+            nodes.genericSection.innerHTML = "Ooops, no se encontraron resultados!, Intenta buscarlo con otro nombre";
+        } else {
+        }
         createMovies(nodes.genericSection, movies);
+
         
         console.log(data.results);
     } catch (error) {
