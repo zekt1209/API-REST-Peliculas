@@ -1,10 +1,6 @@
 import { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
 
-// Eventos para manipular el DOM al cargar y al cambiar de hash
-
-window.addEventListener("DOMContentLoaded", navigation, false);
-window.addEventListener("hashchange", navigation, false);
 
 // Eventos que manipulan al DOM para la navegacion
 
@@ -21,6 +17,10 @@ nodes.arrowBtn.addEventListener("click", () => {
     window.history.back();
 });
 
+// Eventos para manipular el DOM al cargar y al cambiar de hash
+
+window.addEventListener("DOMContentLoaded", navigation, false);
+window.addEventListener("hashchange", navigation, false);
 
 export default function navigation() {
     // console.log ({location});
@@ -89,12 +89,13 @@ const searchPage = () => {
     nodes.categoriesPreviewSection.classList.add("inactive");
     nodes.genericSection.classList.remove("inactive");
     nodes.movieDetailSection.classList.add("inactive");
-
+/*
         // #search=Spiderman
     const pageHash = location.hash.split("=");
     // ['#search', 'Spiderman']
     const query = pageHash[1];
-
+*/
+    const [_, query] = location.hash.split('='); 
     // Le ponemos el titulo buscado
     nodes.headerCategoryTitle.innerHTML = "Se muestran resultados de: " + decodeURI(query);
     getMoviesBySearch(query);
