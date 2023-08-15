@@ -1,0 +1,28 @@
+{
+  "name": "api-rest-peliculas",
+  "version": "1.0.0",
+  "description": "Curso de consumo de API REST con JavaScript",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "gh-pages -d ./"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zekt1209/API-REST-Peliculas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zekt1209/API-REST-Peliculas/issues"
+  },
+  "homepage": "https://github.com/zekt1209/API-REST-Peliculas#readme",
+  "dependencies": {
+    "node-fetch": "^3.3.1"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.0.0"
+  }
+}
