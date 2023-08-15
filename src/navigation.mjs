@@ -3,8 +3,6 @@ import * as nodes from "./nodes.mjs";
 
 // Eventos para manipular el DOM al cargar y al cambiar de hash
 
-window.addEventListener("DOMContentLoaded", navigation, false);
-window.addEventListener("hashchange", navigation, false);
 
 // Eventos que manipulan al DOM para la navegacion
 
@@ -18,9 +16,11 @@ nodes.trendingBtn.addEventListener("click", () => {
 
 nodes.arrowBtn.addEventListener("click", () => {
     console.log("Click arrow button");
-    window.history.back();
+    window.history.go(-1);
 });
 
+window.addEventListener("DOMContentLoaded", navigation, false);
+window.addEventListener("hashchange", navigation, false);
 
 export default function navigation() {
     // console.log ({location});
@@ -31,7 +31,7 @@ export default function navigation() {
         : location.hash.startsWith("#search=")
         ? searchPage()
         : location.hash.startsWith("#movie=")
-        ? moviePage()
+        ? movieDetailsPage()
         : location.hash.startsWith("#category=")
         ? categoryPage()
         : homePage();
@@ -100,7 +100,7 @@ const searchPage = () => {
     getMoviesBySearch(query);
 };
 
-const moviePage = () => {
+const movieDetailsPage = () => {
     console.log("Movie!");
 
     console.log("Categories!");

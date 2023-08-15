@@ -45,6 +45,14 @@ const createMovies = (parentContainer, dataResultArray) => {
 
             movie_container.appendChild(movieImg);
             parentContainer.appendChild(movie_container);
+
+            // eventListener para detalles de una pelicula
+            movie_container.addEventListener('click', () => {
+                const movieId = movie.id;
+                const movieName = movie.original_title;
+                location.hash = `movie=${movieId}-${movieName}`;
+            })
+
         });
 }
 
@@ -356,8 +364,8 @@ const getMoviesBySearch = async (query) => {
         if (movies.length == 0) {
             nodes.genericSection.innerHTML = "Ooops, no se encontraron resultados!, Intenta buscarlo con otro nombre";
         } else {
+            createMovies(nodes.genericSection, movies);
         }
-        createMovies(nodes.genericSection, movies);
 
         
         console.log(data.results);
