@@ -1,4 +1,4 @@
-import { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch } from "./main.mjs";
+import { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
 
 
@@ -118,6 +118,14 @@ const movieDetailsPage = () => {
     nodes.categoriesPreviewSection.classList.add("inactive");
     nodes.genericSection.classList.add("inactive");
     nodes.movieDetailSection.classList.remove("inactive");
+
+    
+    const pageHash = location.hash.split("="); // -> ['#movie=', '569094-Spider-Man']
+    const hashContent = pageHash[1].split("-"); // -> ['569094', 'Spider', 'Man']
+    const movieId = hashContent[0]; // -> ['569094']
+
+    getMovieDetailsById(movieId);
+
 };
 
 const categoryPage = () => {

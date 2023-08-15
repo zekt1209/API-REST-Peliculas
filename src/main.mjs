@@ -7,6 +7,7 @@ import * as nodes from "./nodes.mjs";
 // const API_KEY = '17b0beeb5b0f389cd983177de5c30a80';
 const API_URL = "https://api.themoviedb.org/3";
 const imgUrl = "http://image.tmdb.org/t/p/w300";
+const imgUrl500 = "http://image.tmdb.org/t/p/w500";
 const errorSpan = document.querySelector(".errorSpan");
 
 // Migracion a Axios
@@ -48,8 +49,14 @@ const createMovies = (parentContainer, dataResultArray) => {
 
             // eventListener para detalles de una pelicula
             movie_container.addEventListener('click', () => {
+                // Sacamos el id
                 const movieId = movie.id;
-                const movieName = movie.original_title;
+
+                // Sacamos el name
+                let movieName = decodeURI(movie.original_title);
+                movieName = movieName.replaceAll(" ",'-');
+
+                // Asignamos el hash de movieDetails
                 location.hash = `movie=${movieId}-${movieName}`;
             })
 
@@ -375,6 +382,39 @@ const getMoviesBySearch = async (query) => {
     }
 }
 
+const getMovieDetailsById = async (movieId) => {
+    try {
+        const {data, status} = await api(`/movie/${movieId}`);
+
+        // console.log("MovieId: " + movieId);
+    
+        if (status != '200') {
+            console.error("Error en status de getMovieDetailsById, status: " + status);
+        }
+    
+        const movie = data;
+
+        const movieImgUrl = imgUrl500 + movie.poster_path;
+        console.log(movieImgUrl);
+
+        nodes.headerSection.style.background = `
+        linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
+
+        url(${movieImgUrl})
+        `;
+
+        nodes.movieDetailTitle.innerText = movie.original_title;
+        nodes.movieDetailDescription.innerText = movie.overview;
+        nodes.movieDetailScore.innerText = movie.vote_average.toFixed(1);
+        
+        
+        // console.log(data);
+        console.log('Title: ' + movie.original_title);
+    } catch (error) {
+        console.error("Error en funcion getMovieDetailsById, mensaje para el dev: " + error);
+    }
+}
+
 
 
 // --- Fetch ---
@@ -388,6 +428,6 @@ const getMoviesBySearch = async (query) => {
 // pupularSeries();
 // movieCategories();
 
-export { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch };
+export { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById };
 
 // Test comment git
