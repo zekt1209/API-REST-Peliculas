@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "gh-pages -d"
   },
-  "type":"module",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zekt1209/API-REST-Peliculas.git"
@@ -21,5 +21,8 @@
   "homepage": "https://github.com/zekt1209/API-REST-Peliculas#readme",
   "dependencies": {
     "node-fetch": "^3.3.1"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.0.0"
   }
 }
