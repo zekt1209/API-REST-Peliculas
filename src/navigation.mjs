@@ -106,6 +106,8 @@ const movieDetailsPage = () => {
 
     console.log("Categories!");
 
+    window.scrollTo(0, 0);
+
     nodes.headerSection.classList.add("header-container--long");
     // nodes.headerSection.style.background = "";
     nodes.arrowBtn.classList.remove("inactive");

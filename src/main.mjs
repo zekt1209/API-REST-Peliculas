@@ -41,7 +41,7 @@ const createMovies = (parentContainer, dataResultArray) => {
 
             const movieImg = document.createElement("img");
             movieImg.classList.add("movie-img");
-            movieImg.setAttribute("alt", movie.original_title);
+            movieImg.setAttribute("alt", movie.title);
             movieImg.setAttribute("src", `${imgUrl}${movie.poster_path}`);
 
             movie_container.appendChild(movieImg);
@@ -53,7 +53,7 @@ const createMovies = (parentContainer, dataResultArray) => {
                 const movieId = movie.id;
 
                 // Sacamos el name
-                let movieName = decodeURI(movie.original_title);
+                let movieName = decodeURI(movie.title);
                 movieName = movieName.replaceAll(" ",'-');
 
                 // Asignamos el hash de movieDetails
@@ -394,20 +394,53 @@ const getMovieDetailsById = async (movieId) => {
     
         const movie = data;
 
+        // Generamos el link de la imagen que pondremos con el formato de theMovieDB
         const movieImgUrl = imgUrl500 + movie.poster_path;
         console.log(movieImgUrl);
 
+        // Ponemos la imagen de fondo de movieDetails
         nodes.headerSection.style.background = `
         linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
 
         url(${movieImgUrl})
         `;
 
-        nodes.movieDetailTitle.innerText = movie.original_title;
+        // Titulo, descripcion, reviewAverage
+        nodes.movieDetailTitle.innerText = movie.title;
         nodes.movieDetailDescription.innerText = movie.overview;
         nodes.movieDetailScore.innerText = movie.vote_average.toFixed(1);
         
+        // Obtenemos las categorias de la pelicula
+        const movieCategories = data.genres;
+        console.log(movieCategories);
+
         
+        // Limpiamos contenedor para evitar duplicidad
+        nodes.movieDetailCategoriesList.innerHTML = "";
+
+        // Maquetamos las categorias
+        movieCategories.forEach(element => {
+            nodes.movieDetailCategoriesList.insertAdjacentHTML(
+                'beforeend',
+                `
+                <div class="category-container">
+                <h3
+                    id="id${element.id}"
+                    class="category-title"
+                >
+                    ${element.name}
+                </h3>
+                </div>
+                `
+            );
+
+
+        });
+
+        // Agregar peliculas similares
+        getRelatedMoviesFromMovieDetails(movieId);
+
+
         // console.log(data);
         console.log('Title: ' + movie.original_title);
     } catch (error) {
@@ -415,6 +448,52 @@ const getMovieDetailsById = async (movieId) => {
     }
 }
 
+
+const getRelatedMoviesFromMovieDetails = async (movieId) => {
+    const {data, status} = await api(`/movie/${movieId}/similar`);
+
+    if (status != '200') {
+        console.warn(`Status: ${status} en funcion getRelatedMoviesFromMovieDetails`);
+    }
+
+    const relatedMovies = data.results;
+
+    // Limpiamos el contenedor para evitar duplicidad
+    nodes.relatedMoviesContainer.innerHTML = "";
+    console.log(relatedMovies);
+
+    relatedMovies.forEach(movie => {
+        nodes.relatedMoviesContainer.insertAdjacentHTML('beforeend',
+        `
+        <div id="id${movie.id}" class="movie-container">
+            <img
+                src="${imgUrl}${movie.poster_path}"
+                class="movie-img"
+                alt="${movie.title}"
+            />
+        </div>
+        `
+        );
+
+        // Evento al clickear a la pelicula similar
+        const movieContainer = document.querySelector(`#id${movie.id}`);
+        movieContainer.addEventListener('click', () => {
+            // Sacamos el id
+            const movieId = movie.id;
+
+            // Sacamos el name
+            let movieName = decodeURI(movie.title);
+            movieName = movieName.replaceAll(" ",'-');
+
+            // Asignamos el hash de movieDetails
+            location.hash = `movie=${movieId}-${movieName}`;
+        })
+
+    });
+
+
+
+}
 
 
 // --- Fetch ---
