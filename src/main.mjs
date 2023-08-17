@@ -394,20 +394,48 @@ const getMovieDetailsById = async (movieId) => {
     
         const movie = data;
 
+        // Generamos el link de la imagen que pondremos con el formato de theMovieDB
         const movieImgUrl = imgUrl500 + movie.poster_path;
         console.log(movieImgUrl);
 
+        // Ponemos la imagen de fondo de movieDetails
         nodes.headerSection.style.background = `
         linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
 
         url(${movieImgUrl})
         `;
 
+        // Titulo, descripcion, reviewAverage
         nodes.movieDetailTitle.innerText = movie.original_title;
         nodes.movieDetailDescription.innerText = movie.overview;
         nodes.movieDetailScore.innerText = movie.vote_average.toFixed(1);
         
+        // Obtenemos las categorias de la pelicula
+        const movieCategories = data.genres;
+        console.log(movieCategories);
+
         
+        // Limpiamos contenedor para evitar duplicidad
+        nodes.movieDetailCategoriesList.innerHTML = "";
+
+        // Maquetamos las categorias
+        movieCategories.forEach(element => {
+            nodes.movieDetailCategoriesList.insertAdjacentHTML(
+                'beforeend',
+                `
+                <div class="category-container">
+                <h3
+                    id="id${element.id}"
+                    class="category-title"
+                >
+                    ${element.name}
+                </h3>
+                </div>
+                `
+            );
+        })
+
+
         // console.log(data);
         console.log('Title: ' + movie.original_title);
     } catch (error) {
