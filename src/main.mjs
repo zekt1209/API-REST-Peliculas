@@ -41,7 +41,7 @@ const createMovies = (parentContainer, dataResultArray) => {
 
             const movieImg = document.createElement("img");
             movieImg.classList.add("movie-img");
-            movieImg.setAttribute("alt", movie.original_title);
+            movieImg.setAttribute("alt", movie.title);
             movieImg.setAttribute("src", `${imgUrl}${movie.poster_path}`);
 
             movie_container.appendChild(movieImg);
@@ -53,7 +53,7 @@ const createMovies = (parentContainer, dataResultArray) => {
                 const movieId = movie.id;
 
                 // Sacamos el name
-                let movieName = decodeURI(movie.original_title);
+                let movieName = decodeURI(movie.title);
                 movieName = movieName.replaceAll(" ",'-');
 
                 // Asignamos el hash de movieDetails
@@ -406,7 +406,7 @@ const getMovieDetailsById = async (movieId) => {
         `;
 
         // Titulo, descripcion, reviewAverage
-        nodes.movieDetailTitle.innerText = movie.original_title;
+        nodes.movieDetailTitle.innerText = movie.title;
         nodes.movieDetailDescription.innerText = movie.overview;
         nodes.movieDetailScore.innerText = movie.vote_average.toFixed(1);
         
@@ -433,7 +433,12 @@ const getMovieDetailsById = async (movieId) => {
                 </div>
                 `
             );
-        })
+
+
+        });
+
+        // Agregar peliculas similares
+        getRelatedMoviesFromMovieDetails(movieId);
 
 
         // console.log(data);
@@ -443,6 +448,52 @@ const getMovieDetailsById = async (movieId) => {
     }
 }
 
+
+const getRelatedMoviesFromMovieDetails = async (movieId) => {
+    const {data, status} = await api(`/movie/${movieId}/similar`);
+
+    if (status != '200') {
+        console.warn(`Status: ${status} en funcion getRelatedMoviesFromMovieDetails`);
+    }
+
+    const relatedMovies = data.results;
+
+    // Limpiamos el contenedor para evitar duplicidad
+    nodes.relatedMoviesContainer.innerHTML = "";
+    console.log(relatedMovies);
+
+    relatedMovies.forEach(movie => {
+        nodes.relatedMoviesContainer.insertAdjacentHTML('beforeend',
+        `
+        <div id="id${movie.id}" class="movie-container">
+            <img
+                src="${imgUrl}${movie.poster_path}"
+                class="movie-img"
+                alt="${movie.title}"
+            />
+        </div>
+        `
+        );
+
+        // Evento al clickear a la pelicula similar
+        const movieContainer = document.querySelector(`#id${movie.id}`);
+        movieContainer.addEventListener('click', () => {
+            // Sacamos el id
+            const movieId = movie.id;
+
+            // Sacamos el name
+            let movieName = decodeURI(movie.title);
+            movieName = movieName.replaceAll(" ",'-');
+
+            // Asignamos el hash de movieDetails
+            location.hash = `movie=${movieId}-${movieName}`;
+        })
+
+    });
+
+
+
+}
 
 
 // --- Fetch ---
