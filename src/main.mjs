@@ -63,6 +63,36 @@ const createMovies = (parentContainer, dataResultArray) => {
         });
 }
 
+const createCategories = (parentContainer, dataResultArray) => {
+            // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
+            parentContainer.innerHTML = "";
+
+            dataResultArray.forEach((category) => {
+
+                const categoryId = category.id;
+                const categoryName = category.name;
+    
+                const hash = `#category=${categoryId}-${categoryName}`;
+    
+                parentContainer.insertAdjacentHTML(
+                    "beforeend",
+                    `
+                <div class="category-container">
+                <h3 id="id${category.id}" class="category-title">${category.name}</h3>
+                </div>
+                `
+                );
+    
+                // Event that calls the function to load movies by category
+                const categoryTitle = document.querySelector(`#id${categoryId}`);
+                categoryTitle.addEventListener("click", () => {
+                    console.log(category.id + " " + category.name);
+                    location.hash = hash;
+                });
+            });
+
+}
+
 
 
 // Llamados a la API
@@ -196,6 +226,10 @@ const pupularSeries = async () => {
             serieImg.setAttribute("alt", serie.original_name);
             serieImg.setAttribute("src", `${imgUrl}${serie.poster_path}`);
 
+            // serie_container.addEventListener('click', () => {
+
+            // });
+
             serie_container.appendChild(serieImg);
             nodes.trendingSeriePreviewList.appendChild(serie_container);
         });
@@ -284,6 +318,8 @@ const movieCategories = async () => {
         const categories = data.genres;
         // console.log(categories);
 
+        /*
+
         const categoriesPreviewList = document.querySelector("#categoriesPreview .categoriesPreview-list");
 
 
@@ -313,6 +349,10 @@ const movieCategories = async () => {
                 location.hash = hash;
             });
         });
+
+        */
+
+        createCategories(nodes.categoriesPreviewList, categories);
 
         // console.log(categoriesArray);
 
@@ -396,7 +436,7 @@ const getMovieDetailsById = async (movieId) => {
 
         // Generamos el link de la imagen que pondremos con el formato de theMovieDB
         const movieImgUrl = imgUrl500 + movie.poster_path;
-        console.log(movieImgUrl);
+        //console.log(movieImgUrl);
 
         // Ponemos la imagen de fondo de movieDetails
         nodes.headerSection.style.background = `
@@ -411,31 +451,48 @@ const getMovieDetailsById = async (movieId) => {
         nodes.movieDetailScore.innerText = movie.vote_average.toFixed(1);
         
         // Obtenemos las categorias de la pelicula
-        const movieCategories = data.genres;
-        console.log(movieCategories);
+        //const movieCategories = data.genres;
+        //console.log(movieCategories);
 
-        
+        createCategories(nodes.movieDetailCategoriesList, movie.genres);
+
+
+        /*
         // Limpiamos contenedor para evitar duplicidad
         nodes.movieDetailCategoriesList.innerHTML = "";
 
         // Maquetamos las categorias
-        movieCategories.forEach(element => {
+        movieCategories.forEach((category) => {
+
+            const categoryId = category.id;
+            const categoryName = category.name;
+
+            const hash = `#category=${categoryId}-${categoryName}`;
+
             nodes.movieDetailCategoriesList.insertAdjacentHTML(
                 'beforeend',
                 `
                 <div class="category-container">
                 <h3
-                    id="id${element.id}"
+                    id="id${category.id}"
                     class="category-title"
                 >
-                    ${element.name}
+                    ${category.name}
                 </h3>
                 </div>
                 `
             );
 
+            // Event that calls the function to load movies by category
+            const categoryTitle = document.querySelector(`#id${categoryId}`);
 
+            categoryTitle.addEventListener("click", () => {
+                console.log(category.id + " " + category.name);
+                location.hash = hash;
+            });
         });
+*/
+
 
         // Agregar peliculas similares
         getRelatedMoviesFromMovieDetails(movieId);
@@ -460,7 +517,10 @@ const getRelatedMoviesFromMovieDetails = async (movieId) => {
 
     // Limpiamos el contenedor para evitar duplicidad
     nodes.relatedMoviesContainer.innerHTML = "";
-    console.log(relatedMovies);
+    //console.log(relatedMovies);
+
+    // Hacemos scroll al principio de la lista siempre
+    nodes.relatedMoviesContainer.scrollTo(0,0);
 
     relatedMovies.forEach(movie => {
         nodes.relatedMoviesContainer.insertAdjacentHTML('beforeend',
