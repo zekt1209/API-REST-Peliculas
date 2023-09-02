@@ -67,30 +67,46 @@ const createCategories = (parentContainer, dataResultArray) => {
             // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
             parentContainer.innerHTML = "";
 
-            dataResultArray.forEach((category) => {
+            // dataResultArray.forEach(category => {
 
-                const categoryId = category.id;
-                const categoryName = category.name;
+            //     const categoryId = category.id;
+            //     const categoryName = category.name;
     
-                const hash = `#category=${categoryId}-${categoryName}`;
+            //     //const hash = `#category=${category.id}-${category.name}`;
     
-                parentContainer.insertAdjacentHTML(
-                    "beforeend",
-                    `
-                <div class="category-container">
-                <h3 id="id${category.id}" class="category-title">${category.name}</h3>
-                </div>
-                `
-                );
+            //     parentContainer.insertAdjacentHTML(
+            //         "beforeend",
+            //         `
+            //     <div class="category-container">
+            //     <h3 id="id${category.id}" class="category-title">${category.name}</h3>
+            //     </div>
+            //     `
+            //     );
     
-                // Event that calls the function to load movies by category
-                const categoryTitle = document.querySelector(`#id${categoryId}`);
-                categoryTitle.addEventListener("click", () => {
-                    console.log(category.id + " " + category.name);
-                    location.hash = hash;
+            //     // Event that calls the function to load movies by category
+            //     const categoryTitle = document.querySelector(`#id${category.id}`);
+            //     categoryTitle.addEventListener("click", () => {
+            //         console.log(category.id + " " + category.name);
+            //         location.hash = `#category=${category.id}-${category.name}`;
+            //     });
+            // });
+
+            dataResultArray.forEach(category => {  
+                const categoryContainer = document.createElement('div');
+                categoryContainer.classList.add('category-container');
+            
+                const categoryTitle = document.createElement('h3');
+                categoryTitle.classList.add('category-title');
+                categoryTitle.setAttribute('id', 'id' + category.id);
+                categoryTitle.addEventListener('click', () => {
+                  location.hash = `#category=${category.id}-${category.name}`;
                 });
-            });
-
+                const categoryTitleText = document.createTextNode(category.name);
+            
+                categoryTitle.appendChild(categoryTitleText);
+                categoryContainer.appendChild(categoryTitle);
+                parentContainer.appendChild(categoryContainer);
+              });
 }
 
 

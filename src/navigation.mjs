@@ -23,9 +23,10 @@ window.addEventListener("DOMContentLoaded", navigation, false);
 window.addEventListener("hashchange", navigation, false);
 
 export default function navigation() {
-    // console.log ({location});
+    console.log ({location});
 
     // Sintaxis else if con operadores ternarios
+    /*
     location.hash.startsWith("#trends")
         ? trendsPage()
         : location.hash.startsWith("#search=")
@@ -35,9 +36,20 @@ export default function navigation() {
         : location.hash.startsWith("#category=")
         ? categoryPage()
         : homePage();
-    popularMovies();
-    pupularSeries();
-    movieCategories();
+        */
+
+        if (location.hash.startsWith("#trends")) {
+            trendsPage();
+        } else if (location.hash.startsWith("#search=")) {
+            searchPage();
+        } else if (location.hash.startsWith("#movie=")) {
+            movieDetailsPage();
+        } else if (location.hash.startsWith("#category=")) {
+            categoryPage();
+        } else {
+            homePage();
+        }
+        
 }
 
 function homePage() {
@@ -55,6 +67,10 @@ function homePage() {
     nodes.categoriesPreviewSection.classList.remove("inactive");
     nodes.genericSection.classList.add("inactive");
     nodes.movieDetailSection.classList.add("inactive");
+
+    popularMovies();
+    pupularSeries();
+    movieCategories();
 }
 
 const trendsPage = () => {
@@ -104,7 +120,7 @@ const searchPage = () => {
 const movieDetailsPage = () => {
     console.log("Movie!");
 
-    console.log("Categories!");
+    //console.log("Categories!");
 
     window.scrollTo(0, 0);
 
