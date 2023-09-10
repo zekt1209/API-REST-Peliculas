@@ -151,6 +151,7 @@ button {
 
 .movie-img, .serie-img {
   border-radius: 8px;
+  min-height: 370px;
 }
 
 .categoriesPreview-list, .categories-list {
@@ -356,6 +357,8 @@ button {
   z-index: 1;
   position: absolute;
   background-color: var(--purple-light-1);
+  /* Cambio para que no se buguie cuando no hay descripcion */
+  width: 100%;
 }
 
 .movieDetail-title {
