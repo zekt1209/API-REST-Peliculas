@@ -28,6 +28,8 @@ const axiosBearer = axios.create({
 
 // Utils
 
+const posterPorDefecto = "https://media.comicbook.com/files/img/default-movie.png";
+
 const lazyLoader = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
 
@@ -35,10 +37,14 @@ const lazyLoader = new IntersectionObserver((entries) => {
 
         if (entry.isIntersecting) {
             const url = entry.target.getAttribute('data-img');
+            // console.log(entry.target);
             entry.target.setAttribute('src', url);
-            // const url = movieImg.getAttribute('data-img');
-            // movieImg.setAttribute('src', url);
+                // const url = movieImg.getAttribute('data-img');
+                // movieImg.setAttribute('src', url);
         }
+        
+        // Dejamos de observar al elemento una vez que ya haya sido cargado
+        // lazyLoader.unobserve(entry);
 
     })
 });
@@ -61,10 +67,30 @@ const createMovies = (parentContainer, dataResultArray, lazyLoad = false) => {
             movieImg.classList.add("movie-img");
             movieImg.setAttribute("alt", movie.title);
             //movieImg.setAttribute("custom-attt", 'test');
+
+            // Mi opcion de manejo de error cuando no se encuentra el poster
+            /*
+            let poster = '';
+
+            if (!movie.poster_path) {
+                poster = 'https://motivatevalmorgan.com/wp-content/uploads/2016/06/default-movie.jpg'
+            } else {
+                poster = `${imgUrl}${movie.poster_path}`
+            }
+            */
+
+            // console.log(poster);
+
+
             movieImg.setAttribute(
                 lazyLoad ? "data-img" : "src", 
                 `${imgUrl}${movie.poster_path}`
                 );
+
+            // Manejo de error de carga del poster
+            movieImg.addEventListener('error', () => {
+                movieImg.setAttribute('src', 'https://motivatevalmorgan.com/wp-content/uploads/2016/06/default-movie.jpg');
+            });
 
             if (lazyLoad) {
                 lazyLoader.observe(movieImg);
@@ -90,12 +116,10 @@ const createMovies = (parentContainer, dataResultArray, lazyLoad = false) => {
         });
 }
 
-const createSeries = (parentContainer, dataResultArray) => {
-        // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
-        parentContainer.innerHTML = "";
+const createSeries = (parentContainer, dataResultArray, lazyLoad = false) => {
 
         // Limpiamos el contenedor de peliculas
-        //nodes.trendingMoviesPreviewList.innerHTML = '';
+        parentContainer.innerHTML = "";
 
         // Hacemos scroll al principio de la lista siempre
         parentContainer.scrollTo(0,0);
@@ -107,7 +131,11 @@ const createSeries = (parentContainer, dataResultArray) => {
             const serieImg = document.createElement("img");
             serieImg.classList.add("serie-img");
             serieImg.setAttribute("alt", serie.name);
-            serieImg.setAttribute("src", `${imgUrl}${serie.poster_path}`);
+            serieImg.setAttribute(lazyLoad ? "data-img" : "src", `${imgUrl}${serie.poster_path}`);
+
+            if (lazyLoad) {
+                lazyLoader.observe(serieImg);
+            }
 
             serie_container.appendChild(serieImg);
             parentContainer.appendChild(serie_container);
@@ -321,7 +349,7 @@ const pupularSeries = async () => {
         */
 
         // Nueva estructura escalable
-        createSeries(nodes.trendingSeriePreviewList, series);
+        createSeries(nodes.trendingSeriePreviewList, series, true);
 
     } catch (error) {
         errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
@@ -485,7 +513,7 @@ const getMoviesByCategory = async (id) => {
 
         const movies = data.results;
 
-        createMovies(nodes.genericSection, movies);
+        createMovies(nodes.genericSection, movies, true);
         
         console.log(data.results);
     } catch (error) {
@@ -540,13 +568,33 @@ const getMovieDetailsById = async (movieId) => {
         const movieImgUrl = imgUrl500 + movie.poster_path;
         //console.log(movieImgUrl);
 
-        // Ponemos la imagen de fondo de movieDetails
-        nodes.headerSection.style.background = `
-        linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
+        console.log("POSTER_PATH: " + movie.poster_path);
 
-        url(${movieImgUrl})
-        `;
+        // Validamos que el poster de fondo exista, sino ponemos una imagen por defecto
+        if (movie.poster_path) {
 
+            // Ponemos la imagen de fondo de movieDetails
+            nodes.headerSection.style.background = `
+            linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
+    
+            url(${movieImgUrl})
+            `;
+
+        } else {
+            
+            // console.log("ERROR CON EL POSTER !!! ");
+
+            nodes.headerSection.style.background = `
+            linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
+    
+            url(${posterPorDefecto})
+            `;
+    
+        }
+
+
+
+        
         // Titulo, descripcion, reviewAverage
         nodes.movieDetailTitle.innerText = movie.title;
         nodes.movieDetailDescription.innerText = movie.overview;
@@ -623,18 +671,32 @@ const getSerieDetailsById = async (serieId) => {
     
         const serie = data;
 
-        console.log(serie)
+        // console.log(serie)
 
         // Generamos el link de la imagen que pondremos con el formato de theMovieDB
         const serieImgUrl = imgUrl500 + serie.poster_path;
         //console.log(serieImgUrl);
 
-        // Ponemos la imagen de fondo de serieDetails
-        nodes.headerSection.style.background = `
-        linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
+        if (serie.poster_path) {
 
-        url(${serieImgUrl})
-        `;
+            // Ponemos la imagen de fondo de serieDetails
+            nodes.headerSection.style.background = `
+            linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
+    
+            url(${serieImgUrl})
+            `;
+
+        } else {
+
+            // Ponemos la imagen de fondo de serieDetails
+            nodes.headerSection.style.background = `
+            linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
+    
+            url(${posterPorDefecto})
+            `;
+
+        }
+
 
         // Titulo, descripcion, reviewAverage
         nodes.movieDetailTitle.innerText = serie.name;
@@ -706,6 +768,12 @@ const getRelatedMoviesFromMovieDetails = async (movieId) => {
 
     const relatedMovies = data.results;
 
+    console.log(relatedMovies);
+    console.log(data.results[19].poster_path);
+
+    // Estructura vieja
+    /*
+
     // Limpiamos el contenedor para evitar duplicidad
     nodes.relatedMoviesContainer.innerHTML = "";
     //console.log(relatedMovies);
@@ -742,7 +810,10 @@ const getRelatedMoviesFromMovieDetails = async (movieId) => {
 
     });
 
+    */
 
+    // Estructura nueva
+    createMovies(nodes.relatedMoviesContainer, relatedMovies, true);
 
 }
 
@@ -804,7 +875,7 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
         */
     
         // Estructura nueva
-        createMovies(nodes.relatedMoviesContainer ,relatedSeries);
+        createMovies(nodes.relatedMoviesContainer ,relatedSeries, true);
 
     } catch (e) {
         console.log('Error en funcion getRelatedSeriesFromMovieDetails: ' + e);
