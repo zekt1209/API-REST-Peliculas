@@ -265,8 +265,9 @@ const popularMovies = async () => {
         // console.log(headers);
         // console.log(config);
         // console.log(request);
-
+        
         const movies = data.results;
+        // console.log(movies);
 
         createMovies(nodes.trendingMoviesPreviewList, movies, true);
     } catch (error) {
@@ -324,7 +325,7 @@ const pupularSeries = async () => {
         }
 
         const series = data.results;
-        console.log(series);        
+        // console.log(series);        
 
         // Vieja estructura
         /*
@@ -367,7 +368,7 @@ const getTrendingMovies = async () => {
 
     const movies = data.results;
 
-    createMovies(nodes.genericSection, movies);
+    createMovies(nodes.genericSection, movies, true);
 };
 
 // GET para obtener las series en Tendencia
@@ -541,7 +542,7 @@ const getMoviesBySearch = async (query) => {
         if (movies.length == 0) {
             nodes.genericSection.innerHTML = "Ooops, no se encontraron resultados!, Intenta buscarlo con otro nombre";
         } else {
-            createMovies(nodes.genericSection, movies);
+            createMovies(nodes.genericSection, movies, true);
         }
 
         
