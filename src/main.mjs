@@ -32,6 +32,9 @@ const createMovies = (parentContainer, dataResultArray) => {
         // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
         parentContainer.innerHTML = "";
 
+        // // Hacemos scroll al principio de la lista siempre
+        parentContainer.scrollTo(0,0);
+
         // Limpiamos el contenedor de peliculas
         //nodes.trendingMoviesPreviewList.innerHTML = '';
 
@@ -58,6 +61,44 @@ const createMovies = (parentContainer, dataResultArray) => {
 
                 // Asignamos el hash de movieDetails
                 location.hash = `movie=${movieId}-${movieName}`;
+            })
+
+        });
+}
+
+const createSeries = (parentContainer, dataResultArray) => {
+        // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
+        parentContainer.innerHTML = "";
+
+        // Limpiamos el contenedor de peliculas
+        //nodes.trendingMoviesPreviewList.innerHTML = '';
+
+        // Hacemos scroll al principio de la lista siempre
+        parentContainer.scrollTo(0,0);
+
+        dataResultArray.forEach((serie) => {
+            const serie_container = document.createElement("div");
+            serie_container.classList.add("serie-container");
+
+            const serieImg = document.createElement("img");
+            serieImg.classList.add("serie-img");
+            serieImg.setAttribute("alt", serie.name);
+            serieImg.setAttribute("src", `${imgUrl}${serie.poster_path}`);
+
+            serie_container.appendChild(serieImg);
+            parentContainer.appendChild(serie_container);
+
+            // eventListener para detalles de una pelicula
+            serie_container.addEventListener('click', () => {
+                // Sacamos el id
+                const serieId = serie.id;
+
+                // Sacamos el name
+                let serieName = decodeURI(serie.name);
+                serieName = serieName.replaceAll(" ",'-');
+
+                // Asignamos el hash de serieDetails
+                location.hash = `serie=${serieId}-${serieName}`;
             })
 
         });
@@ -113,7 +154,8 @@ const createCategories = (parentContainer, dataResultArray) => {
 
 // Llamados a la API
 
-// *** GET para obtener las peliculas en Tendencia ***
+
+// *** GET para obtener las peliculas en Tendencia preview***
 
 // --- Fetch ---
 // const popularMovies = async (apiUrl) => {
@@ -181,7 +223,7 @@ const popularMovies = async () => {
     }
 };
 
-// GET para obtener las series en Tendencia
+// GET para obtener las series en Tendencia preview
 
 // --- Fetch ---
 // const pupularSeries = async (apiUrl) => {
@@ -229,8 +271,11 @@ const pupularSeries = async () => {
             console.log("Error en status de peticion de la funcion pupularSeries, status: " + status);
         }
 
-        const series = data.results;        
+        const series = data.results;
+        console.log(series);        
 
+        // Vieja estructura
+        /*
         nodes.trendingSeriePreviewList.innerHTML = "";
 
         series.forEach((serie) => {
@@ -249,11 +294,28 @@ const pupularSeries = async () => {
             serie_container.appendChild(serieImg);
             nodes.trendingSeriePreviewList.appendChild(serie_container);
         });
+        */
+
+        // Nueva estructura escalable
+        createSeries(nodes.trendingSeriePreviewList, series);
 
     } catch (error) {
         errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
         console.log("Error en funcion pupularSeries: " + error);
     }
+};
+
+// GET para la vista de peliculas en Tendencia
+const getTrendingMovies = async () => {
+    const {data, status} = await api(`/trending/movie/day?language=es`);
+
+    if (status != '200') {
+        console.log('Error en el STATUS: ' + status);
+    }
+
+    const movies = data.results;
+
+    createMovies(nodes.genericSection, movies);
 };
 
 // GET para obtener las series en Tendencia
@@ -521,6 +583,95 @@ const getMovieDetailsById = async (movieId) => {
     }
 }
 
+const getSerieDetailsById = async (serieId) => {
+    try {
+        const {data, status} = await api(`/tv/${serieId}`, {
+            params: {
+            language: 'es-MX'
+        }
+    });
+
+        // console.log("MovieId: " + movieId);
+    
+        if (status != '200') {
+            console.error("Error en status de getSerieDetailsById, status: " + status);
+        }
+    
+        const serie = data;
+
+        console.log(serie)
+
+        // Generamos el link de la imagen que pondremos con el formato de theMovieDB
+        const serieImgUrl = imgUrl500 + serie.poster_path;
+        //console.log(serieImgUrl);
+
+        // Ponemos la imagen de fondo de serieDetails
+        nodes.headerSection.style.background = `
+        linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
+
+        url(${serieImgUrl})
+        `;
+
+        // Titulo, descripcion, reviewAverage
+        nodes.movieDetailTitle.innerText = serie.name;
+        nodes.movieDetailDescription.innerText = serie.overview;
+        nodes.movieDetailScore.innerText = serie.vote_average.toFixed(1);
+        
+        // Obtenemos las categorias de la pelicula
+        //const serieCategories = serie.genres;
+        //console.log(serieCategories);
+
+        createCategories(nodes.movieDetailCategoriesList, serie.genres);
+
+        /*
+        // Limpiamos contenedor para evitar duplicidad
+        nodes.movieDetailCategoriesList.innerHTML = "";
+
+        // Maquetamos las categorias
+        movieCategories.forEach((category) => {
+
+            const categoryId = category.id;
+            const categoryName = category.name;
+
+            const hash = `#category=${categoryId}-${categoryName}`;
+
+            nodes.movieDetailCategoriesList.insertAdjacentHTML(
+                'beforeend',
+                `
+                <div class="category-container">
+                <h3
+                    id="id${category.id}"
+                    class="category-title"
+                >
+                    ${category.name}
+                </h3>
+                </div>
+                `
+            );
+
+            // Event that calls the function to load movies by category
+            const categoryTitle = document.querySelector(`#id${categoryId}`);
+
+            categoryTitle.addEventListener("click", () => {
+                console.log(category.id + " " + category.name);
+                location.hash = hash;
+            });
+        });
+*/
+
+        // Agregar Series similares
+        getRelatedSeriesFromMovieDetails(serieId);
+
+
+        // console.log(data);
+        //console.log('Name: ' + serie.name);
+    } catch (error) {
+        console.error("Error en funcion getSerieDetailsById, mensaje para el dev: " + error);
+    }
+}
+
+
+
 
 const getRelatedMoviesFromMovieDetails = async (movieId) => {
     const {data, status} = await api(`/movie/${movieId}/similar`);
@@ -571,6 +722,73 @@ const getRelatedMoviesFromMovieDetails = async (movieId) => {
 
 }
 
+const getRelatedSeriesFromMovieDetails = async (serieId) => {
+
+    try {
+
+        const {data, status} = await api(`/tv/${serieId}/similar`);
+    
+        if (status != '200') {
+            console.warn(`Status: ${status} en funcion getRelatedSeriesFromSerieDetails`);
+        }
+    
+        const relatedSeries = data.results;
+    
+        // Estructura vieja
+        /*
+        
+        // Limpiamos el contenedor para evitar duplicidad
+        nodes.relatedMoviesContainer.innerHTML = "";
+        //console.log(relatedMovies);
+    
+        // Hacemos scroll al principio de la lista siempre
+        nodes.relatedMoviesContainer.scrollTo(0,0);
+    
+        relatedSeries.forEach(serie => {
+            nodes.relatedMoviesContainer.insertAdjacentHTML('beforeend',
+            `
+            <div id="id${movie.id}" class="movie-container">
+                <img
+                    src="${imgUrl}${movie.poster_path}"
+                    class="movie-img"
+                    alt="${movie.title}"
+                />
+            </div>
+            `
+            );
+    
+            
+    
+            // Evento al clickear a la pelicula similar
+            const movieContainer = document.querySelector(`#id${movie.id}`);
+            movieContainer.addEventListener('click', () => {
+                // Sacamos el id
+                const movieId = movie.id;
+    
+                // Sacamos el name
+                let movieName = decodeURI(movie.title);
+                movieName = movieName.replaceAll(" ",'-');
+    
+                // Asignamos el hash de movieDetails
+                location.hash = `movie=${movieId}-${movieName}`;
+            })
+    
+    
+    
+        });
+    
+        */
+    
+        // Estructura nueva
+        createMovies(nodes.relatedMoviesContainer ,relatedSeries);
+
+    } catch (e) {
+        console.log('Error en funcion getRelatedSeriesFromMovieDetails: ' + e);
+    }
+    
+
+}
+
 
 // --- Fetch ---
 // popularMovies(API_URL);
@@ -583,6 +801,6 @@ const getRelatedMoviesFromMovieDetails = async (movieId) => {
 // pupularSeries();
 // movieCategories();
 
-export { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById };
+export { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById};
 
 // Test comment git

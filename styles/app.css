@@ -131,6 +131,24 @@ button {
   animation-delay: .8s;
 }
 
+/* Movies by categories */
+.movie-container-bycategory--loading div{
+  background: var(--purple-light-2);
+  border-radius: 8px;
+  height: 309px;
+  /* min-height: 225px; */
+  /* max-height: 225px; */
+  width: 206px;
+  /* min-width: 150px; */
+  /* max-width: 150px;  */
+  margin-bottom: 15px;
+  animation: loading-skeleton infinite 1.5s;
+}
+
+.movie-container-bycategory--loading:nth-child(2) div{
+  animation-delay: .2s;
+}
+
 .movie-img, .serie-img {
   border-radius: 8px;
 }
@@ -142,6 +160,8 @@ button {
   position: relative;
   flex-wrap: wrap;
 }
+
+
 
 .trendingPreview-header__series {
   margin-top: 20px;
@@ -251,6 +271,23 @@ button {
 .category-container {
   width: 45%;
 }
+
+.category-container--loading div{
+  background: var(--purple-light-2);
+  border-radius: 8px;
+  height: 25px;
+  min-height: 25px;
+  max-height: 25px;
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+  margin-bottom: 15px;
+  animation: loading-skeleton infinite 1.5s;
+}
+.category-container--loading:nth-child(2) div{
+  animation-delay: .2s;
+}
+
 
 .category-title {
   margin-bottom: 8px;

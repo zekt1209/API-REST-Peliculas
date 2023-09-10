@@ -1,4 +1,4 @@
-import { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById } from "./main.mjs";
+import { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
 
 
@@ -40,13 +40,20 @@ export default function navigation() {
 
         if (location.hash.startsWith("#trends")) {
             trendsPage();
-        } else if (location.hash.startsWith("#search=")) {
+        } 
+        else if (location.hash.startsWith("#search=")) {
             searchPage();
-        } else if (location.hash.startsWith("#movie=")) {
+        } 
+        else if (location.hash.startsWith("#movie=")) {
             movieDetailsPage();
-        } else if (location.hash.startsWith("#category=")) {
+        } 
+        else if (location.hash.startsWith("#serie=")) {
+            serieDetailsPage();
+        } 
+        else if (location.hash.startsWith("#category=")) {
             categoryPage();
-        } else {
+        } 
+        else {
             homePage();
         }
         
@@ -88,6 +95,11 @@ const trendsPage = () => {
     nodes.categoriesPreviewSection.classList.add("inactive");
     nodes.genericSection.classList.remove("inactive");
     nodes.movieDetailSection.classList.add("inactive");
+
+    // Le ponemos el titulo a la vista de Tendencias
+    nodes.headerCategoryTitle.innerText = 'Tendencias';
+
+    getTrendingMovies();
 };
 
 const searchPage = () => {
@@ -118,7 +130,7 @@ const searchPage = () => {
 };
 
 const movieDetailsPage = () => {
-    console.log("Movie!");
+    console.log("Movie details!");
 
     //console.log("Categories!");
 
@@ -145,6 +157,35 @@ const movieDetailsPage = () => {
     getMovieDetailsById(movieId);
 
 };
+
+const serieDetailsPage = () => {
+    console.log("Serie Details!");
+
+    //console.log("Categories!");
+
+    window.scrollTo(0, 0);
+
+    nodes.headerSection.classList.add("header-container--long");
+    // nodes.headerSection.style.background = "";
+    nodes.arrowBtn.classList.remove("inactive");
+    nodes.arrowBtn.classList.add("header-arrow--white");
+    nodes.headerTitle.classList.add("inactive");
+    nodes.headerCategoryTitle.classList.add("inactive");
+    nodes.searchForm.classList.add("inactive");
+
+    nodes.trendingPreviewSection.classList.add("inactive");
+    nodes.categoriesPreviewSection.classList.add("inactive");
+    nodes.genericSection.classList.add("inactive");
+    nodes.movieDetailSection.classList.remove("inactive");
+
+    
+    const pageHash = location.hash.split("="); // -> ['#movie=', '569094-Spider-Man']
+    const hashContent = pageHash[1].split("-"); // -> ['569094', 'Spider', 'Man']
+    const serieId = hashContent[0]; // -> ['569094']
+
+    getSerieDetailsById(serieId);
+
+}
 
 const categoryPage = () => {
     console.log("Categories!");
