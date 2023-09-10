@@ -28,7 +28,22 @@ const axiosBearer = axios.create({
 
 // Utils
 
-const createMovies = (parentContainer, dataResultArray) => {
+const lazyLoader = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+
+        //console.log(entry.target.setAttribute);
+
+        if (entry.isIntersecting) {
+            const url = entry.target.getAttribute('data-img');
+            entry.target.setAttribute('src', url);
+            // const url = movieImg.getAttribute('data-img');
+            // movieImg.setAttribute('src', url);
+        }
+
+    })
+});
+
+const createMovies = (parentContainer, dataResultArray, lazyLoad = false) => {
         // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
         parentContainer.innerHTML = "";
 
@@ -45,7 +60,16 @@ const createMovies = (parentContainer, dataResultArray) => {
             const movieImg = document.createElement("img");
             movieImg.classList.add("movie-img");
             movieImg.setAttribute("alt", movie.title);
-            movieImg.setAttribute("src", `${imgUrl}${movie.poster_path}`);
+            //movieImg.setAttribute("custom-attt", 'test');
+            movieImg.setAttribute(
+                lazyLoad ? "data-img" : "src", 
+                `${imgUrl}${movie.poster_path}`
+                );
+
+            if (lazyLoad) {
+                lazyLoader.observe(movieImg);
+            }
+
 
             movie_container.appendChild(movieImg);
             parentContainer.appendChild(movie_container);
@@ -216,7 +240,7 @@ const popularMovies = async () => {
 
         const movies = data.results;
 
-        createMovies(nodes.trendingMoviesPreviewList, movies);
+        createMovies(nodes.trendingMoviesPreviewList, movies, true);
     } catch (error) {
         errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
         console.log(error);
