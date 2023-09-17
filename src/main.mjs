@@ -8,7 +8,9 @@ import * as nodes from "./nodes.mjs";
 const API_URL = "https://api.themoviedb.org/3";
 const imgUrl = "http://image.tmdb.org/t/p/w300";
 const imgUrl500 = "http://image.tmdb.org/t/p/w500";
-const errorSpan = document.querySelector(".errorSpan");
+
+// Mostrar la pagina 1 por defecto cuando utilicemos paginacion en el infinite scrolling
+let page = 1;
 
 // Migracion a Axios
 const api = axios.create({
@@ -49,9 +51,12 @@ const lazyLoader = new IntersectionObserver((entries) => {
     })
 });
 
-const createMovies = (parentContainer, dataResultArray, lazyLoad = false) => {
-        // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
-        parentContainer.innerHTML = "";
+const createMovies = (parentContainer, dataResultArray, {lazyLoad = false, clean = true} = {}) => {
+
+        if (clean) {
+            // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
+            parentContainer.innerHTML = "";
+        }
 
         // // Hacemos scroll al principio de la lista siempre
         parentContainer.scrollTo(0,0);
@@ -245,7 +250,7 @@ const createCategories = (parentContainer, dataResultArray) => {
 //         });
 
 //     } catch (error) {
-//         errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
+//         nodes.errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
 //         console.log(error);
 //     }
 // }
@@ -269,9 +274,9 @@ const popularMovies = async () => {
         const movies = data.results;
         // console.log(movies);
 
-        createMovies(nodes.trendingMoviesPreviewList, movies, true);
+        createMovies(nodes.trendingMoviesPreviewList, movies, {lazyLoad: true, clean: true});
     } catch (error) {
-        errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
+        nodes.errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
         console.log(error);
     }
 };
@@ -310,7 +315,7 @@ const popularMovies = async () => {
 //         });
 
 //     } catch (error) {
-//         errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
+//         nodes.errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
 //         console.log("Error en funcion pupularSeries: " + error);
 //     }
 // }
@@ -353,14 +358,14 @@ const pupularSeries = async () => {
         createSeries(nodes.trendingSeriePreviewList, series, true);
 
     } catch (error) {
-        errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
+        nodes.errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
         console.log("Error en funcion pupularSeries: " + error);
     }
 };
 
 // GET para la vista de peliculas en Tendencia
 const getTrendingMovies = async () => {
-    const {data, status} = await api(`/trending/movie/day?language=es`);
+    const {data, status} = await api(`/trending/movie/day`);
 
     if (status != '200') {
         console.log('Error en el STATUS: ' + status);
@@ -368,8 +373,57 @@ const getTrendingMovies = async () => {
 
     const movies = data.results;
 
-    createMovies(nodes.genericSection, movies, true);
+    createMovies(nodes.genericSection, movies, {lazyLoad:true, clean:true});
+
+    const btnLoadMore = document.createElement('button');
+    btnLoadMore.innerText = 'Cargar mas';
+
+    btnLoadMore.addEventListener('click', () => {
+        btnLoadMore.style.display = 'none';
+        getPaginatedTrendingMovies();
+    });
+
+    nodes.genericSection.appendChild(btnLoadMore);
+
 };
+
+const getPaginatedTrendingMovies = async () => {
+    page ++;
+
+    try {
+
+        const {data, status} = await api('/trending/movie/day', {
+            params: {
+                page,
+            }
+        });
+
+        if (status != '200') {
+            console.warn("Status error: " + error);
+        }
+
+        const movies = data.results;
+    
+        createMovies(nodes.genericSection, movies, {lazyLoad: true, clean: false});
+
+        const btnLoadMore = document.createElement('button');
+        btnLoadMore.innerText = 'Cargar mas';
+    
+        btnLoadMore.addEventListener('click', () => {
+            btnLoadMore.style.display = 'none';
+            getPaginatedTrendingMovies();
+        });
+
+    
+        nodes.genericSection.appendChild(btnLoadMore);
+
+    } catch (e) {
+        nodes.errorSpan.innerText = 'Ooops, algo fallo en la funcion getPaginatedTrendingMovies, error: ' + e;
+        console.warn("Error en la funcion getPaginatedTrendingMovies: " + e);
+    }
+
+
+}
 
 // GET para obtener las series en Tendencia
 
@@ -423,7 +477,7 @@ const getTrendingMovies = async () => {
 //         categoriesPreviewList.innerHTML = finalCategoriesElement;
 
 //     } catch (error) {
-//         errorSpan.innerText = "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " + error;
+//         nodes.errorSpan.innerText = "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " + error;
 //         console.error(error);
 //     }
 
@@ -493,7 +547,7 @@ const movieCategories = async () => {
 
         //categoriesPreviewList.innerHTML = finalCategoriesElement;
     } catch (error) {
-        errorSpan.innerText = "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " + error;
+        nodes.errorSpan.innerText = "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " + error;
         console.warn("Error toJSON(): ");
         //console.error(error.toJSON());
     }
@@ -514,12 +568,12 @@ const getMoviesByCategory = async (id) => {
 
         const movies = data.results;
 
-        createMovies(nodes.genericSection, movies, true);
+        createMovies(nodes.genericSection, movies, {lazyLoad:true, clean:false});
         
         console.log(data.results);
     } catch (error) {
         console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
-        errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
+        nodes.errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
     }
 };
 
@@ -542,14 +596,14 @@ const getMoviesBySearch = async (query) => {
         if (movies.length == 0) {
             nodes.genericSection.innerHTML = "Ooops, no se encontraron resultados!, Intenta buscarlo con otro nombre";
         } else {
-            createMovies(nodes.genericSection, movies, true);
+            createMovies(nodes.genericSection, movies, {lazyLoad:true, clean:false});
         }
 
         
         console.log(data.results);
     } catch (error) {
         console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
-        errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
+        nodes.errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
     }
 }
 
@@ -814,7 +868,7 @@ const getRelatedMoviesFromMovieDetails = async (movieId) => {
     */
 
     // Estructura nueva
-    createMovies(nodes.relatedMoviesContainer, relatedMovies, true);
+    createMovies(nodes.relatedMoviesContainer, relatedMovies, {lazyLoad:true, clean:true});
 
 }
 
@@ -876,7 +930,7 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
         */
     
         // Estructura nueva
-        createMovies(nodes.relatedMoviesContainer ,relatedSeries, true);
+        createMovies(nodes.relatedMoviesContainer ,relatedSeries, {lazyLoad:true, clean:true});
 
     } catch (e) {
         console.log('Error en funcion getRelatedSeriesFromMovieDetails: ' + e);
