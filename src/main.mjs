@@ -553,12 +553,15 @@ const movieCategories = async () => {
     }
 };
 
-const getMoviesByCategory = async (id) => {
+const getMoviesByCategory = async (id, moviesByCategoryPage = 1) => {
     try {
+        // Set the page we will show at the beginning in 1
+
         let { data, status } = await api("/discover/movie", {
             params: {
                 with_genres: id,
                 language: 'es-MX',
+                page: moviesByCategoryPage,
             },
         });
 
@@ -568,21 +571,33 @@ const getMoviesByCategory = async (id) => {
 
         const movies = data.results;
 
-        createMovies(nodes.genericSection, movies, {lazyLoad:true, clean:false});
+        createMovies(nodes.genericSection, movies, {lazyLoad:true, clean: moviesByCategoryPage == 1}); // Seteamos que solo limpie si es la primera pagina
+
+        const btnLoadMore = document.createElement('button');
+        btnLoadMore.innerText = 'Cargar mas';
+
+        btnLoadMore.addEventListener('click', () => {
+            getMoviesByCategory(id, moviesByCategoryPage + 1)
+            btnLoadMore.remove();
+        });
+
+        nodes.genericSection.appendChild(btnLoadMore);
         
-        console.log(data.results);
+        //console.log(data.results);
     } catch (error) {
         console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
         nodes.errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
     }
 };
 
-const getMoviesBySearch = async (query) => {
+const getMoviesBySearch = async (query, page = 1) => {
+    // on theMovieDB > SEARCH > Movies
     try {
         let { data, status } = await api("/search/movie", {
             params: {
                 query,
                 language: 'es-MX',
+                page,
             },
         });
 
@@ -596,11 +611,20 @@ const getMoviesBySearch = async (query) => {
         if (movies.length == 0) {
             nodes.genericSection.innerHTML = "Ooops, no se encontraron resultados!, Intenta buscarlo con otro nombre";
         } else {
-            createMovies(nodes.genericSection, movies, {lazyLoad:true, clean:false});
+            createMovies(nodes.genericSection, movies, {lazyLoad:true, clean: page == 1});
         }
 
+        const btnLoadMore = document.createElement('button');
+        btnLoadMore.innerText = "Cargar mas";
+
+        btnLoadMore.addEventListener('click', () => {
+            getMoviesBySearch(query, page + 1);
+            btnLoadMore.remove();
+        });
+
+        nodes.genericSection.appendChild(btnLoadMore);
         
-        console.log(data.results);
+        //console.log(data.results);
     } catch (error) {
         console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
         nodes.errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
