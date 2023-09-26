@@ -373,54 +373,81 @@ const getTrendingMovies = async () => {
 
     const movies = data.results;
 
+    console.log(data);
+    console.log(movies);
+    // console.log()
+
     createMovies(nodes.genericSection, movies, {lazyLoad:true, clean:true});
 
-    const btnLoadMore = document.createElement('button');
-    btnLoadMore.innerText = 'Cargar mas';
+    // const btnLoadMore = document.createElement('button');
+    // btnLoadMore.innerText = 'Cargar mas';
 
-    btnLoadMore.addEventListener('click', () => {
-        btnLoadMore.style.display = 'none';
+    // btnLoadMore.addEventListener('click', () => {
+    //     btnLoadMore.style.display = 'none';
+    //     getPaginatedTrendingMovies();
+    // });
+
+    
+    // nodes.genericSection.appendChild(btnLoadMore);
+    
+    window.addEventListener('scroll', () => {
         getPaginatedTrendingMovies();
     });
-
-    nodes.genericSection.appendChild(btnLoadMore);
-
 };
 
 const getPaginatedTrendingMovies = async () => {
-    page ++;
 
-    try {
+    // let scrollTop = document.documentElement.scrollTop;
+    // let clientHeight = document.documentElement.clientHeight;
+    // let scrollHeight = document.documentElement.scrollHeight;
 
-        const {data, status} = await api('/trending/movie/day', {
-            params: {
-                page,
+    const {scrollTop, 
+        clientHeight, 
+        scrollHeight} = document.documentElement;
+
+    if ((scrollTop + clientHeight) >= (scrollHeight - 139)) {
+        
+        page ++;
+        
+        try {
+            const {data, status} = await api('/trending/movie/day', {
+                params: {
+                    page,
+                }
+            });
+            
+            if (status != '200') {
+                console.warn("Status error: " + error);
             }
-        });
+            
+            const movies = data.results;
+            console.log("Hey, new page has loaded: " + page);
+            console.log(movies);
+        
+            createMovies(nodes.genericSection, movies, {lazyLoad: true, clean: false});
+    
+            // const btnLoadMore = document.createElement('button');
+            // btnLoadMore.innerText = 'Cargar mas';
+        
+            // btnLoadMore.addEventListener('click', () => {
+            //     btnLoadMore.style.display = 'none';
+            //     getPaginatedTrendingMovies();
+            // });
+    
+        
+            // nodes.genericSection.appendChild(btnLoadMore);
 
-        if (status != '200') {
-            console.warn("Status error: " + error);
+        } catch (e) {
+            nodes.errorSpan.innerText = 'Ooops, algo fallo en la funcion getPaginatedTrendingMovies, error: ' + e;
+            console.warn("Error en la funcion getPaginatedTrendingMovies: " + e);
         }
-
-        const movies = data.results;
-    
-        createMovies(nodes.genericSection, movies, {lazyLoad: true, clean: false});
-
-        const btnLoadMore = document.createElement('button');
-        btnLoadMore.innerText = 'Cargar mas';
-    
-        btnLoadMore.addEventListener('click', () => {
-            btnLoadMore.style.display = 'none';
-            getPaginatedTrendingMovies();
-        });
-
-    
-        nodes.genericSection.appendChild(btnLoadMore);
-
-    } catch (e) {
-        nodes.errorSpan.innerText = 'Ooops, algo fallo en la funcion getPaginatedTrendingMovies, error: ' + e;
-        console.warn("Error en la funcion getPaginatedTrendingMovies: " + e);
     }
+
+
+
+
+
+
 
 
 }
