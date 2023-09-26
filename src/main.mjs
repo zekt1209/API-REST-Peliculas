@@ -3,14 +3,12 @@ import API_KEY, { ACCESS_TOKEN } from "./secrets.mjs";
 import navigation from "./navigation.mjs";
 import * as nodes from "./nodes.mjs";
 //import {num1} from './nodes.mjs';
+import {page, incPage} from "./navigation.mjs";
 
 // const API_KEY = '17b0beeb5b0f389cd983177de5c30a80';
 const API_URL = "https://api.themoviedb.org/3";
 const imgUrl = "http://image.tmdb.org/t/p/w300";
 const imgUrl500 = "http://image.tmdb.org/t/p/w500";
-
-// Mostrar la pagina 1 por defecto cuando utilicemos paginacion en el infinite scrolling
-let page = 1;
 
 // Migracion a Axios
 const api = axios.create({
@@ -390,10 +388,9 @@ const getTrendingMovies = async () => {
     
     // nodes.genericSection.appendChild(btnLoadMore);
     
-    window.addEventListener('scroll', () => {
-        getPaginatedTrendingMovies();
-    });
+    //window.addEventListener('scroll', getPaginatedTrendingMovies);
 };
+
 
 const getPaginatedTrendingMovies = async () => {
 
@@ -405,11 +402,15 @@ const getPaginatedTrendingMovies = async () => {
         clientHeight, 
         scrollHeight} = document.documentElement;
 
+        console.log("Hey! ");
+
     if ((scrollTop + clientHeight) >= (scrollHeight - 139)) {
         
-        page ++;
         
         try {
+            console.log(page + " typeOf: " + typeof(page));
+            // Incrementa la pagina +1
+            incPage();
             const {data, status} = await api('/trending/movie/day', {
                 params: {
                     page,
@@ -617,7 +618,7 @@ const getMoviesByCategory = async (id, moviesByCategoryPage = 1) => {
     }
 };
 
-const getMoviesBySearch = async (query, page = 1) => {
+const getMoviesBySearch = async (query, /* page = 1 */) => {
     // on theMovieDB > SEARCH > Movies
     try {
         let { data, status } = await api("/search/movie", {
@@ -638,18 +639,18 @@ const getMoviesBySearch = async (query, page = 1) => {
         if (movies.length == 0) {
             nodes.genericSection.innerHTML = "Ooops, no se encontraron resultados!, Intenta buscarlo con otro nombre";
         } else {
-            createMovies(nodes.genericSection, movies, {lazyLoad:true, clean: page == 1});
+        createMovies(nodes.genericSection, movies, {lazyLoad:true, /*clean: page == 1*/});
         }
 
-        const btnLoadMore = document.createElement('button');
-        btnLoadMore.innerText = "Cargar mas";
+        // const btnLoadMore = document.createElement('button');
+        // btnLoadMore.innerText = "Cargar mas";
 
-        btnLoadMore.addEventListener('click', () => {
-            getMoviesBySearch(query, page + 1);
-            btnLoadMore.remove();
-        });
+        // btnLoadMore.addEventListener('click', () => {
+        //     getMoviesBySearch(query, page + 1);
+        //     btnLoadMore.remove();
+        // });
 
-        nodes.genericSection.appendChild(btnLoadMore);
+        // nodes.genericSection.appendChild(btnLoadMore);
         
         //console.log(data.results);
     } catch (error) {
@@ -1002,6 +1003,6 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
 // pupularSeries();
 // movieCategories();
 
-export { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById};
+export { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies};
 
 // Test comment git

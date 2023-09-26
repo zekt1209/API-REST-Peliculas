@@ -1,5 +1,16 @@
-import { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById } from "./main.mjs";
+import { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
+
+// Mostrar la pagina 1 por defecto cuando utilicemos paginacion en el infinite scrolling
+let page = 1;
+
+// Funcion para incrementar la pagina, llamarla desde main.js en ves de poner page++ alla, ya que cuando exportas una variable, del otro lado se recibe como const, no imprta como fue declarada, es por eso que aqui mismo hacemos la operacion que tengamos que hacer con la variable y la encapsulamos en una funcion
+const incPage = () => {
+    page++;
+}
+
+// Esta variable va a cambiar por el nombre de la funcion de paginacion dependiendo de la pagina donde estemos p.e. getPaginatedTrendingMovies
+let infiniteScrolling;
 
 
 // Eventos que manipulan al DOM para la navegacion
@@ -21,9 +32,16 @@ nodes.arrowBtn.addEventListener("click", () => {
 
 window.addEventListener("DOMContentLoaded", navigation, false);
 window.addEventListener("hashchange", navigation, false);
+window.addEventListener("scroll", infiniteScrolling, {passive: false});
 
 export default function navigation() {
     console.log ({location});
+
+    // Removemos el eventLintener de la funcion paginadora y limpiamos la variable para que despues de la navegacion, la asigne en caso de que esa pagina necesita paginacion (Mas ababo en esta funcion la volvemos a asignar)
+    if (infiniteScrolling) {
+        window.removeEventListener("scroll", infiniteScrolling, false);
+        infiniteScrolling = undefined;
+    }
 
     // Sintaxis else if con operadores ternarios
     /*
@@ -55,6 +73,10 @@ export default function navigation() {
         } 
         else {
             homePage();
+        }
+
+        if (infiniteScrolling) {
+            window.addEventListener("scroll", infiniteScrolling, {passive: false});
         }
         
 }
@@ -100,6 +122,8 @@ const trendsPage = () => {
     nodes.headerCategoryTitle.innerText = 'Tendencias';
 
     getTrendingMovies();
+
+    infiniteScrolling = getPaginatedTrendingMovies;
 };
 
 const searchPage = () => {
@@ -222,3 +246,5 @@ const categoryPage = () => {
 };
 
 // navigation();
+
+export {page, incPage};
