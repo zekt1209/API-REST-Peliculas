@@ -1,6 +1,8 @@
 import { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
 
+
+let maxPage;
 // Mostrar la pagina 1 por defecto cuando utilicemos paginacion en el infinite scrolling
 let page = 1;
 

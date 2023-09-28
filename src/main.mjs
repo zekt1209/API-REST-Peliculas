@@ -10,6 +10,8 @@ const API_URL = "https://api.themoviedb.org/3";
 const imgUrl = "http://image.tmdb.org/t/p/w300";
 const imgUrl500 = "http://image.tmdb.org/t/p/w500";
 
+let maxPage;
+
 // Migracion a Axios
 const api = axios.create({
     baseURL: "https://api.themoviedb.org/3",
@@ -42,7 +44,7 @@ const lazyLoader = new IntersectionObserver((entries) => {
                 // const url = movieImg.getAttribute('data-img');
                 // movieImg.setAttribute('src', url);
         }
-        
+
         // Dejamos de observar al elemento una vez que ya haya sido cargado
         // lazyLoader.unobserve(entry);
 
@@ -86,7 +88,7 @@ const createMovies = (parentContainer, dataResultArray, {lazyLoad = false, clean
 
 
             movieImg.setAttribute(
-                lazyLoad ? "data-img" : "src", 
+                lazyLoad ? "data-img" : "src",
                 `${imgUrl}${movie.poster_path}`
                 );
 
@@ -167,9 +169,9 @@ const createCategories = (parentContainer, dataResultArray) => {
 
             //     const categoryId = category.id;
             //     const categoryName = category.name;
-    
+
             //     //const hash = `#category=${category.id}-${category.name}`;
-    
+
             //     parentContainer.insertAdjacentHTML(
             //         "beforeend",
             //         `
@@ -178,7 +180,7 @@ const createCategories = (parentContainer, dataResultArray) => {
             //     </div>
             //     `
             //     );
-    
+
             //     // Event that calls the function to load movies by category
             //     const categoryTitle = document.querySelector(`#id${category.id}`);
             //     categoryTitle.addEventListener("click", () => {
@@ -187,10 +189,10 @@ const createCategories = (parentContainer, dataResultArray) => {
             //     });
             // });
 
-            dataResultArray.forEach(category => {  
+            dataResultArray.forEach(category => {
                 const categoryContainer = document.createElement('div');
                 categoryContainer.classList.add('category-container');
-            
+
                 const categoryTitle = document.createElement('h3');
                 categoryTitle.classList.add('category-title');
                 categoryTitle.setAttribute('id', 'id' + category.id);
@@ -198,7 +200,7 @@ const createCategories = (parentContainer, dataResultArray) => {
                   location.hash = `#category=${category.id}-${category.name}`;
                 });
                 const categoryTitleText = document.createTextNode(category.name);
-            
+
                 categoryTitle.appendChild(categoryTitleText);
                 categoryContainer.appendChild(categoryTitle);
                 parentContainer.appendChild(categoryContainer);
@@ -268,7 +270,7 @@ const popularMovies = async () => {
         // console.log(headers);
         // console.log(config);
         // console.log(request);
-        
+
         const movies = data.results;
         // console.log(movies);
 
@@ -328,7 +330,7 @@ const pupularSeries = async () => {
         }
 
         const series = data.results;
-        // console.log(series);        
+        // console.log(series);
 
         // Vieja estructura
         /*
@@ -371,8 +373,9 @@ const getTrendingMovies = async () => {
 
     const movies = data.results;
 
-    console.log(data);
-    console.log(movies);
+    console.log(data.total_pages + " Pages");
+    maxPage = data.total_pages;
+    // console.log(movies);
     // console.log()
 
     createMovies(nodes.genericSection, movies, {lazyLoad:true, clean:true});
@@ -385,9 +388,9 @@ const getTrendingMovies = async () => {
     //     getPaginatedTrendingMovies();
     // });
 
-    
+
     // nodes.genericSection.appendChild(btnLoadMore);
-    
+
     //window.addEventListener('scroll', getPaginatedTrendingMovies);
 };
 
@@ -398,17 +401,21 @@ const getPaginatedTrendingMovies = async () => {
     // let clientHeight = document.documentElement.clientHeight;
     // let scrollHeight = document.documentElement.scrollHeight;
 
-    const {scrollTop, 
-        clientHeight, 
+    const {scrollTop,
+        clientHeight,
         scrollHeight} = document.documentElement;
 
-        console.log("Hey! ");
+        console.log("Scroll");
 
-    if ((scrollTop + clientHeight) >= (scrollHeight - 139)) {
-        
-        
+    const scrollIsBottom = (scrollTop + clientHeight) >= (scrollHeight - 139);
+
+    const pageInRange = page < maxPage;
+
+
+    if (scrollIsBottom && pageInRange) {
+
+
         try {
-            console.log(page + " typeOf: " + typeof(page));
             // Incrementa la pagina +1
             incPage();
             const {data, status} = await api('/trending/movie/day', {
@@ -416,26 +423,26 @@ const getPaginatedTrendingMovies = async () => {
                     page,
                 }
             });
-            
+
             if (status != '200') {
                 console.warn("Status error: " + error);
             }
-            
+
             const movies = data.results;
             console.log("Hey, new page has loaded: " + page);
             console.log(movies);
-        
+
             createMovies(nodes.genericSection, movies, {lazyLoad: true, clean: false});
-    
+
             // const btnLoadMore = document.createElement('button');
             // btnLoadMore.innerText = 'Cargar mas';
-        
+
             // btnLoadMore.addEventListener('click', () => {
             //     btnLoadMore.style.display = 'none';
             //     getPaginatedTrendingMovies();
             // });
-    
-        
+
+
             // nodes.genericSection.appendChild(btnLoadMore);
 
         } catch (e) {
@@ -610,7 +617,7 @@ const getMoviesByCategory = async (id, moviesByCategoryPage = 1) => {
         });
 
         nodes.genericSection.appendChild(btnLoadMore);
-        
+
         //console.log(data.results);
     } catch (error) {
         console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
@@ -651,7 +658,7 @@ const getMoviesBySearch = async (query, /* page = 1 */) => {
         // });
 
         // nodes.genericSection.appendChild(btnLoadMore);
-        
+
         //console.log(data.results);
     } catch (error) {
         console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
@@ -664,11 +671,11 @@ const getMovieDetailsById = async (movieId) => {
         const {data, status} = await api(`/movie/${movieId}`);
 
         // console.log("MovieId: " + movieId);
-    
+
         if (status != '200') {
             console.error("Error en status de getMovieDetailsById, status: " + status);
         }
-    
+
         const movie = data;
 
         // Generamos el link de la imagen que pondremos con el formato de theMovieDB
@@ -683,30 +690,30 @@ const getMovieDetailsById = async (movieId) => {
             // Ponemos la imagen de fondo de movieDetails
             nodes.headerSection.style.background = `
             linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
-    
+
             url(${movieImgUrl})
             `;
 
         } else {
-            
+
             // console.log("ERROR CON EL POSTER !!! ");
 
             nodes.headerSection.style.background = `
             linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
-    
+
             url(${posterPorDefecto})
             `;
-    
+
         }
 
 
 
-        
+
         // Titulo, descripcion, reviewAverage
         nodes.movieDetailTitle.innerText = movie.title;
         nodes.movieDetailDescription.innerText = movie.overview;
         nodes.movieDetailScore.innerText = movie.vote_average.toFixed(1);
-        
+
         // Obtenemos las categorias de la pelicula
         //const movieCategories = data.genres;
         //console.log(movieCategories);
@@ -771,11 +778,11 @@ const getSerieDetailsById = async (serieId) => {
     });
 
         // console.log("MovieId: " + movieId);
-    
+
         if (status != '200') {
             console.error("Error en status de getSerieDetailsById, status: " + status);
         }
-    
+
         const serie = data;
 
         // console.log(serie)
@@ -789,7 +796,7 @@ const getSerieDetailsById = async (serieId) => {
             // Ponemos la imagen de fondo de serieDetails
             nodes.headerSection.style.background = `
             linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
-    
+
             url(${serieImgUrl})
             `;
 
@@ -798,7 +805,7 @@ const getSerieDetailsById = async (serieId) => {
             // Ponemos la imagen de fondo de serieDetails
             nodes.headerSection.style.background = `
             linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
-    
+
             url(${posterPorDefecto})
             `;
 
@@ -809,7 +816,7 @@ const getSerieDetailsById = async (serieId) => {
         nodes.movieDetailTitle.innerText = serie.name;
         nodes.movieDetailDescription.innerText = serie.overview;
         nodes.movieDetailScore.innerText = serie.vote_average.toFixed(1);
-        
+
         // Obtenemos las categorias de la pelicula
         //const serieCategories = serie.genres;
         //console.log(serieCategories);
@@ -929,23 +936,23 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
     try {
 
         const {data, status} = await api(`/tv/${serieId}/similar`);
-    
+
         if (status != '200') {
             console.warn(`Status: ${status} en funcion getRelatedSeriesFromSerieDetails`);
         }
-    
+
         const relatedSeries = data.results;
-    
+
         // Estructura vieja
         /*
-        
+
         // Limpiamos el contenedor para evitar duplicidad
         nodes.relatedMoviesContainer.innerHTML = "";
         //console.log(relatedMovies);
-    
+
         // Hacemos scroll al principio de la lista siempre
         nodes.relatedMoviesContainer.scrollTo(0,0);
-    
+
         relatedSeries.forEach(serie => {
             nodes.relatedMoviesContainer.insertAdjacentHTML('beforeend',
             `
@@ -958,36 +965,36 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
             </div>
             `
             );
-    
-            
-    
+
+
+
             // Evento al clickear a la pelicula similar
             const movieContainer = document.querySelector(`#id${movie.id}`);
             movieContainer.addEventListener('click', () => {
                 // Sacamos el id
                 const movieId = movie.id;
-    
+
                 // Sacamos el name
                 let movieName = decodeURI(movie.title);
                 movieName = movieName.replaceAll(" ",'-');
-    
+
                 // Asignamos el hash de movieDetails
                 location.hash = `movie=${movieId}-${movieName}`;
             })
-    
-    
-    
+
+
+
         });
-    
+
         */
-    
+
         // Estructura nueva
         createMovies(nodes.relatedMoviesContainer ,relatedSeries, {lazyLoad:true, clean:true});
 
     } catch (e) {
         console.log('Error en funcion getRelatedSeriesFromMovieDetails: ' + e);
     }
-    
+
 
 }
 
