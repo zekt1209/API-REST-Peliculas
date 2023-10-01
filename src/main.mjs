@@ -951,7 +951,8 @@ const getSerieDetailsById = async (serieId) => {
         nodes.movieDetailDescription.innerText = serie.overview;
 
         // FALTA consumir la API del trailer de una Serie para insertarlo aqui, de momento solo limpiamos para que no se translape con el trailer de la pelicula anterior consultada
-        nodes.movieDetailVideoArticle.innerHTML = "";
+        // nodes.movieDetailVideoArticle.innerHTML = "";
+        getSerieTrailerVideo(serieId);
 
         nodes.movieDetailScore.innerText = serie.vote_average.toFixed(1);
 
@@ -1039,6 +1040,14 @@ const getMovieTrailerVideo = async (movieId) => {
                 movieDetailsTrailer.classList.add('movieDetail__trailerVideo');
                 movieDetailsTrailer.setAttribute('frameborder', "0");
                 movieDetailsTrailer.setAttribute('allowfullscreen', true);
+
+                // Youtube video QUERY PARAMETERS, NOT ATTRIBUTES
+
+                // src format - https://www.youtube.com/embed/tgbNymZ7vqY
+                // Youtube Autoplay + Mute - ?autoplay = 1 & mute = 1
+                // Youtube Loop - loop = 1
+                // Youtube Controls - controls = 1
+
                 movieDetailsTrailer.setAttribute("src", `${youtubeBaseUrl}${videoId}`);
                 nodes.movieDetailVideoArticle.appendChild(movieDetailsTrailer);
             } else {
@@ -1063,6 +1072,70 @@ const getMovieTrailerVideo = async (movieId) => {
         console.warn("Error en funcion getMovieTrailerVideo, mensaje para el desarrollador: " + e);
     }
 
+
+}
+const getSerieTrailerVideo = async (serieId) => {
+
+    try {
+
+        const {data, status} = await api(`https://api.themoviedb.org/3/tv/${serieId}/videos`, {
+            params: {
+                language: "en-US",
+            }
+        });
+    
+        if (status != '200') {
+            console.warn("Error en status de funcion getSerieTrailerVideo, status: " + status);
+        }
+
+        const video = data.results;
+        console.log(video.length);
+
+        if (video.length > 0) {
+
+            const videoId = video[0].key;
+            // console.log(videoId);
+    
+            // Validamos si la API regresa un trailer, sino ponemos una imagen por defecto
+    
+            if (videoId) {
+                nodes.movieDetailVideoArticle.innerHTML = "";
+
+                let movieDetailsTrailer = document.createElement('iframe');
+                movieDetailsTrailer.classList.add('movieDetail__trailerVideo');
+                movieDetailsTrailer.setAttribute('frameborder', "0");
+                movieDetailsTrailer.setAttribute('allowfullscreen', true);
+
+                // Youtube video QUERY PARAMETERS, NOT ATTRIBUTES
+
+                // src format - https://www.youtube.com/embed/tgbNymZ7vqY
+                // Youtube Autoplay + Mute - ?autoplay = 1 & mute = 1
+                // Youtube Loop - loop = 1
+                // Youtube Controls - controls = 1
+
+                movieDetailsTrailer.setAttribute("src", `${youtubeBaseUrl}${videoId}`);
+                nodes.movieDetailVideoArticle.appendChild(movieDetailsTrailer);
+            } else {
+                // Limpiamos el contenedor cuando no hay trailer disponible
+                console.log("el arreglo de la api de videos no regresa nada! Limpiamos ...");
+                nodes.movieDetailVideoArticle.innerHTML = "";
+    
+                // OPCION: Creamos el elemento de la imagen que insertaremos cuando no hay trailer
+                // let noVideoImage = document.createElement('img');
+                // noVideoImage.classList.add('movieDetail__trailerVideo');
+                // noVideoImage.setAttribute('src', trailerPorDefecto);
+                // nodes.movieDetailVideoArticle.appendChild(noVideoImage);
+            }
+
+        } else {
+            nodes.movieDetailVideoArticle.innerHTML = "";
+        }
+
+
+
+    } catch (e) {
+        console.warn("Error en funcion getSerieTrailerVideo, mensaje para el desarrollador: " + e);
+    }
 
 }
 
@@ -1138,6 +1211,8 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
 
         const relatedSeries = data.results;
 
+        console.log(relatedSeries)
+
         // Estructura vieja
         /*
 
@@ -1184,7 +1259,8 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
         */
 
         // Estructura nueva
-        createMovies(nodes.relatedMoviesContainer ,relatedSeries, {lazyLoad:true, clean:true});
+        // createMovies(nodes.relatedMoviesContainer, relatedSeries, {lazyLoad:true, clean:true});
+        createSeries(nodes.relatedMoviesContainer, relatedSeries);
 
     } catch (e) {
         console.log('Error en funcion getRelatedSeriesFromMovieDetails: ' + e);

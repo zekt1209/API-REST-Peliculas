@@ -251,13 +251,13 @@ button {
 }
 
 .trendingPreview-movieList .movie-container, 
-.trendingPreview-serieList .serie-container {
+/*.trendingPreview-serieList */.serie-container {
   display: inline-block;
   margin-right: 8px;
 }
 
 .trendingPreview-movieList .movie-container .movie-img, 
-.trendingPreview-serieList .serie-container .serie-img {
+/*.trendingPreview-serieList .serie-container */.serie-img {
   height: 225px;
   min-height: 225px;
   max-height: 225px;
