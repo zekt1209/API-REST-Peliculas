@@ -9,7 +9,7 @@ import {page, incPage} from "./navigation.mjs";
 const API_URL = "https://api.themoviedb.org/3";
 const imgUrl = "http://image.tmdb.org/t/p/w300";
 const imgUrl500 = "http://image.tmdb.org/t/p/w500";
-const youtubeBaseUrl = "https://www.youtube.com/watch?v=";
+const youtubeBaseUrl = "https://www.youtube.com/embed/";
 
 let maxPage;
 
@@ -32,7 +32,7 @@ const axiosBearer = axios.create({
 // Utils
 
 const posterPorDefecto = "https://media.comicbook.com/files/img/default-movie.png";
-const trailerPorDefecto = "https://media.comicbook.com/files/img/default-movie.png";
+const trailerPorDefecto = "https://i.insider.com/5b0d4c731ae6622f008b4f81?width=700";
 
 const lazyLoader = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -843,7 +843,6 @@ const getMovieDetailsById = async (movieId) => {
         nodes.movieDetailTitle.innerText = movie.title;
         nodes.movieDetailDescription.innerText = movie.overview;
 
-
         // Insertar aqui la funcion que maqueta el trailer
         getMovieTrailerVideo(movieId);
 
@@ -950,6 +949,10 @@ const getSerieDetailsById = async (serieId) => {
         // Titulo, descripcion, reviewAverage
         nodes.movieDetailTitle.innerText = serie.name;
         nodes.movieDetailDescription.innerText = serie.overview;
+
+        // FALTA consumir la API del trailer de una Serie para insertarlo aqui, de momento solo limpiamos para que no se translape con el trailer de la pelicula anterior consultada
+        nodes.movieDetailVideoArticle.innerHTML = "";
+
         nodes.movieDetailScore.innerText = serie.vote_average.toFixed(1);
 
         // Obtenemos las categorias de la pelicula
@@ -1020,17 +1023,39 @@ const getMovieTrailerVideo = async (movieId) => {
         }
 
         const video = data.results;
-        const videoId = video[0].key;
-        // console.log(videoId);
+        console.log(video.length);
 
-        // Validamos si la API regresa un trailer, sino ponemos una imagen por defecto
+        if (video.length > 0) {
 
-        console.log(nodes.movieDetailTrailerVideo);
-        // if (videoId) {
-        //     nodes.movieDetailTrailerVideo.src = `${youtubeBaseUrl}${videoId}`;
-        // } else {
-        //     nodes.movieDetailTrailerVideo.setAttribute("src", trailerPorDefecto);
-        // }
+            const videoId = video[0].key;
+            // console.log(videoId);
+    
+            // Validamos si la API regresa un trailer, sino ponemos una imagen por defecto
+    
+            if (videoId) {
+                nodes.movieDetailVideoArticle.innerHTML = "";
+
+                let movieDetailsTrailer = document.createElement('iframe');
+                movieDetailsTrailer.classList.add('movieDetail__trailerVideo');
+                movieDetailsTrailer.setAttribute('frameborder', "0");
+                movieDetailsTrailer.setAttribute('allowfullscreen', true);
+                movieDetailsTrailer.setAttribute("src", `${youtubeBaseUrl}${videoId}`);
+                nodes.movieDetailVideoArticle.appendChild(movieDetailsTrailer);
+            } else {
+                // Limpiamos el contenedor cuando no hay trailer disponible
+                console.log("el arreglo de la api de videos no regresa nada! Limpiamos ...");
+                nodes.movieDetailVideoArticle.innerHTML = "";
+    
+                // OPCION: Creamos el elemento de la imagen que insertaremos cuando no hay trailer
+                // let noVideoImage = document.createElement('img');
+                // noVideoImage.classList.add('movieDetail__trailerVideo');
+                // noVideoImage.setAttribute('src', trailerPorDefecto);
+                // nodes.movieDetailVideoArticle.appendChild(noVideoImage);
+            }
+
+        } else {
+            nodes.movieDetailVideoArticle.innerHTML = "";
+        }
 
 
 
@@ -1053,7 +1078,7 @@ const getRelatedMoviesFromMovieDetails = async (movieId) => {
     const relatedMovies = data.results;
 
     console.log(relatedMovies);
-    console.log(data.results[19].poster_path);
+    // console.log(data.results[19].poster_path);
 
     // Estructura vieja
     /*
