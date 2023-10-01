@@ -3,12 +3,14 @@ import API_KEY, { ACCESS_TOKEN } from "./secrets.mjs";
 import navigation from "./navigation.mjs";
 import * as nodes from "./nodes.mjs";
 //import {num1} from './nodes.mjs';
+import {page, incPage} from "./navigation.mjs";
 
 // const API_KEY = '17b0beeb5b0f389cd983177de5c30a80';
 const API_URL = "https://api.themoviedb.org/3";
 const imgUrl = "http://image.tmdb.org/t/p/w300";
 const imgUrl500 = "http://image.tmdb.org/t/p/w500";
-const errorSpan = document.querySelector(".errorSpan");
+
+let maxPage;
 
 // Migracion a Axios
 const api = axios.create({
@@ -42,16 +44,19 @@ const lazyLoader = new IntersectionObserver((entries) => {
                 // const url = movieImg.getAttribute('data-img');
                 // movieImg.setAttribute('src', url);
         }
-        
+
         // Dejamos de observar al elemento una vez que ya haya sido cargado
         // lazyLoader.unobserve(entry);
 
     })
 });
 
-const createMovies = (parentContainer, dataResultArray, lazyLoad = false) => {
-        // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
-        parentContainer.innerHTML = "";
+const createMovies = (parentContainer, dataResultArray, {lazyLoad = false, clean = true} = {}) => {
+
+        if (clean) {
+            // Seleccionamos el container en HTML donde vamos a insertar el componente de peliculas que vamos a maquetar con info de la API
+            parentContainer.innerHTML = "";
+        }
 
         // // Hacemos scroll al principio de la lista siempre
         parentContainer.scrollTo(0,0);
@@ -83,7 +88,7 @@ const createMovies = (parentContainer, dataResultArray, lazyLoad = false) => {
 
 
             movieImg.setAttribute(
-                lazyLoad ? "data-img" : "src", 
+                lazyLoad ? "data-img" : "src",
                 `${imgUrl}${movie.poster_path}`
                 );
 
@@ -164,9 +169,9 @@ const createCategories = (parentContainer, dataResultArray) => {
 
             //     const categoryId = category.id;
             //     const categoryName = category.name;
-    
+
             //     //const hash = `#category=${category.id}-${category.name}`;
-    
+
             //     parentContainer.insertAdjacentHTML(
             //         "beforeend",
             //         `
@@ -175,7 +180,7 @@ const createCategories = (parentContainer, dataResultArray) => {
             //     </div>
             //     `
             //     );
-    
+
             //     // Event that calls the function to load movies by category
             //     const categoryTitle = document.querySelector(`#id${category.id}`);
             //     categoryTitle.addEventListener("click", () => {
@@ -184,10 +189,10 @@ const createCategories = (parentContainer, dataResultArray) => {
             //     });
             // });
 
-            dataResultArray.forEach(category => {  
+            dataResultArray.forEach(category => {
                 const categoryContainer = document.createElement('div');
                 categoryContainer.classList.add('category-container');
-            
+
                 const categoryTitle = document.createElement('h3');
                 categoryTitle.classList.add('category-title');
                 categoryTitle.setAttribute('id', 'id' + category.id);
@@ -195,7 +200,7 @@ const createCategories = (parentContainer, dataResultArray) => {
                   location.hash = `#category=${category.id}-${category.name}`;
                 });
                 const categoryTitleText = document.createTextNode(category.name);
-            
+
                 categoryTitle.appendChild(categoryTitleText);
                 categoryContainer.appendChild(categoryTitle);
                 parentContainer.appendChild(categoryContainer);
@@ -245,7 +250,7 @@ const createCategories = (parentContainer, dataResultArray) => {
 //         });
 
 //     } catch (error) {
-//         errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
+//         nodes.errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
 //         console.log(error);
 //     }
 // }
@@ -265,13 +270,13 @@ const popularMovies = async () => {
         // console.log(headers);
         // console.log(config);
         // console.log(request);
-        
+
         const movies = data.results;
         // console.log(movies);
 
-        createMovies(nodes.trendingMoviesPreviewList, movies, true);
+        createMovies(nodes.trendingMoviesPreviewList, movies, {lazyLoad: true, clean: true});
     } catch (error) {
-        errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
+        nodes.errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
         console.log(error);
     }
 };
@@ -310,7 +315,7 @@ const popularMovies = async () => {
 //         });
 
 //     } catch (error) {
-//         errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
+//         nodes.errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
 //         console.log("Error en funcion pupularSeries: " + error);
 //     }
 // }
@@ -325,7 +330,7 @@ const pupularSeries = async () => {
         }
 
         const series = data.results;
-        // console.log(series);        
+        // console.log(series);
 
         // Vieja estructura
         /*
@@ -353,14 +358,14 @@ const pupularSeries = async () => {
         createSeries(nodes.trendingSeriePreviewList, series, true);
 
     } catch (error) {
-        errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
+        nodes.errorSpan.innerText = "Oooops! Algo fallo al cargar las Series :( , Mensaje para el developer: " + error;
         console.log("Error en funcion pupularSeries: " + error);
     }
 };
 
 // GET para la vista de peliculas en Tendencia
 const getTrendingMovies = async () => {
-    const {data, status} = await api(`/trending/movie/day?language=es`);
+    const {data, status} = await api(`/trending/movie/day`);
 
     if (status != '200') {
         console.log('Error en el STATUS: ' + status);
@@ -368,8 +373,85 @@ const getTrendingMovies = async () => {
 
     const movies = data.results;
 
-    createMovies(nodes.genericSection, movies, true);
+    console.log(data.total_pages + " Pages");
+    maxPage = data.total_pages;
+    // console.log(movies);
+    // console.log()
+
+    createMovies(nodes.genericSection, movies, {lazyLoad:true, clean:true});
+
+    // const btnLoadMore = document.createElement('button');
+    // btnLoadMore.innerText = 'Cargar mas';
+
+    // btnLoadMore.addEventListener('click', () => {
+    //     btnLoadMore.style.display = 'none';
+    //     getPaginatedTrendingMovies();
+    // });
+
+
+    // nodes.genericSection.appendChild(btnLoadMore);
+
+    //window.addEventListener('scroll', getPaginatedTrendingMovies);
 };
+
+
+const getPaginatedTrendingMovies = async () => {
+
+    // let scrollTop = document.documentElement.scrollTop;
+    // let clientHeight = document.documentElement.clientHeight;
+    // let scrollHeight = document.documentElement.scrollHeight;
+
+    const {scrollTop,
+        clientHeight,
+        scrollHeight} = document.documentElement;
+
+        console.log("Scroll");
+
+    const scrollIsBottom = (scrollTop + clientHeight) >= (scrollHeight - 139);
+
+    const pageInRange = page < maxPage;
+
+
+    if (scrollIsBottom && pageInRange) {
+
+
+        try {
+            // Incrementa la pagina +1
+            incPage();
+            const {data, status} = await api('/trending/movie/day', {
+                params: {
+                    page,
+                }
+            });
+
+            if (status != '200') {
+                console.warn("Status error: " + error);
+            }
+
+            const movies = data.results;
+            console.log("Hey, new page has loaded: " + page);
+            console.log(movies);
+
+            createMovies(nodes.genericSection, movies, {lazyLoad: true, clean: false});
+
+            // const btnLoadMore = document.createElement('button');
+            // btnLoadMore.innerText = 'Cargar mas';
+
+            // btnLoadMore.addEventListener('click', () => {
+            //     btnLoadMore.style.display = 'none';
+            //     getPaginatedTrendingMovies();
+            // });
+
+
+            // nodes.genericSection.appendChild(btnLoadMore);
+
+        } catch (e) {
+            nodes.errorSpan.innerText = 'Ooops, algo fallo en la funcion getPaginatedTrendingMovies, error: ' + e;
+            console.warn("Error en la funcion getPaginatedTrendingMovies: " + e);
+        }
+    }
+
+}
 
 // GET para obtener las series en Tendencia
 
@@ -423,7 +505,7 @@ const getTrendingMovies = async () => {
 //         categoriesPreviewList.innerHTML = finalCategoriesElement;
 
 //     } catch (error) {
-//         errorSpan.innerText = "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " + error;
+//         nodes.errorSpan.innerText = "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " + error;
 //         console.error(error);
 //     }
 
@@ -493,18 +575,21 @@ const movieCategories = async () => {
 
         //categoriesPreviewList.innerHTML = finalCategoriesElement;
     } catch (error) {
-        errorSpan.innerText = "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " + error;
+        nodes.errorSpan.innerText = "Oooops, algo fallo al cargar las categorias :( , Mensaje para el Developer: " + error;
         console.warn("Error toJSON(): ");
         //console.error(error.toJSON());
     }
 };
 
-const getMoviesByCategory = async (id) => {
+const getMoviesByCategory = async (id /* moviesByCategoryPage = 1 */) => {
     try {
+        // Set the page we will show at the beginning in 1
+
         let { data, status } = await api("/discover/movie", {
             params: {
                 with_genres: id,
                 language: 'es-MX',
+                page
             },
         });
 
@@ -513,22 +598,104 @@ const getMoviesByCategory = async (id) => {
         }
 
         const movies = data.results;
+        maxPage = data.total_pages;
 
-        createMovies(nodes.genericSection, movies, true);
-        
-        console.log(data.results);
+    createMovies(nodes.genericSection, movies, {lazyLoad:true, clean: page == 1 }); // Seteamos que solo limpie si es la primera pagina
+
+
+        /* Infinite scrolling con boton */
+
+        // const btnLoadMore = document.createElement('button');
+        // btnLoadMore.innerText = 'Cargar mas';
+
+        // btnLoadMore.addEventListener('click', () => {
+        //     getMoviesByCategory(id, moviesByCategoryPage + 1)
+        //     btnLoadMore.remove();
+        // });
+
+        // nodes.genericSection.appendChild(btnLoadMore);
+
     } catch (error) {
         console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
-        errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
+        nodes.errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
     }
 };
 
-const getMoviesBySearch = async (query) => {
+const getPaginatedMoviesByCategory = (id) => {
+
+    // let scrollTop = document.documentElement.scrollTop;
+    // let clientHeight = document.documentElement.clientHeight;
+    // let scrollHeight = document.documentElement.scrollHeight;
+
+    return async function() {
+
+        const {scrollTop,
+            clientHeight,
+            scrollHeight} = document.documentElement;
+
+            console.log("scroll in categories!");
+    
+        const scrollIsBottom = (scrollTop + clientHeight) >= (scrollHeight - 139);
+    
+        const pageInRange = page < maxPage;
+
+
+    
+        if (scrollIsBottom && pageInRange) {
+    
+            try {
+
+                // Incrementa la pagina +1
+                incPage();
+
+                const {data, status} = await api('/discover/movie', {
+                    params: {
+                        id,
+                        language: 'es-MX',
+                        page,
+                    }
+                });
+    
+                if (status != '200') {
+                    console.warn("Status error: " + error);
+                }
+    
+                const movies = data.results;
+                console.log("Hey, new page has loaded: " + page);
+                console.log(movies);
+    
+                createMovies(nodes.genericSection, movies, {lazyLoad: true, clean: false});
+    
+                // const btnLoadMore = document.createElement('button');
+                // btnLoadMore.innerText = 'Cargar mas';
+    
+                // btnLoadMore.addEventListener('click', () => {
+                //     btnLoadMore.style.display = 'none';
+                //     getPaginatedTrendingMovies();
+                // });
+    
+    
+                // nodes.genericSection.appendChild(btnLoadMore);
+    
+            } catch (e) {
+                nodes.errorSpan.innerText = 'Ooops, algo fallo en la funcion getPaginatedMoviesByCategory, error: ' + e;
+                console.warn("Error en la funcion getPaginatedMoviesByCategory: " + e);
+            }
+        }
+
+    }
+
+
+}
+
+const getMoviesBySearch = async (query, /* page = 1 */) => {
+    // on theMovieDB > SEARCH > Movies
     try {
         let { data, status } = await api("/search/movie", {
             params: {
                 query,
                 language: 'es-MX',
+                page,
             },
         });
 
@@ -538,19 +705,96 @@ const getMoviesBySearch = async (query) => {
 
         const movies = data.results;
 
+        console.log(data.total_pages + " Pages");
+        maxPage = data.total_pages;
+
         // Checamos si no se encontro ningun resultado
         if (movies.length == 0) {
             nodes.genericSection.innerHTML = "Ooops, no se encontraron resultados!, Intenta buscarlo con otro nombre";
         } else {
-            createMovies(nodes.genericSection, movies, true);
+        createMovies(nodes.genericSection, movies, {lazyLoad:true, /*clean: page == 1*/});
         }
 
-        
-        console.log(data.results);
+        // const btnLoadMore = document.createElement('button');
+        // btnLoadMore.innerText = "Cargar mas";
+
+        // btnLoadMore.addEventListener('click', () => {
+        //     getMoviesBySearch(query, page + 1);
+        //     btnLoadMore.remove();
+        // });
+
+        // nodes.genericSection.appendChild(btnLoadMore);
+
+        //console.log(data.results);
     } catch (error) {
         console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
-        errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
+        nodes.errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
     }
+}
+
+const getPaginatedMoviesBySearch = (query) => {
+
+    // let scrollTop = document.documentElement.scrollTop;
+    // let clientHeight = document.documentElement.clientHeight;
+    // let scrollHeight = document.documentElement.scrollHeight;
+
+    return async function() {
+
+        const {scrollTop,
+            clientHeight,
+            scrollHeight} = document.documentElement;
+
+            console.log("scroll!!!");
+    
+        const scrollIsBottom = (scrollTop + clientHeight) >= (scrollHeight - 139);
+    
+        const pageInRange = page < maxPage;
+
+
+    
+        if (scrollIsBottom && pageInRange) {
+    
+            try {
+                // Incrementa la pagina +1
+                incPage();
+                const {data, status} = await api('/search/movie', {
+                    params: {
+                        query,
+                        language: 'es-MX',
+                        page,
+                    }
+                });
+    
+                if (status != '200') {
+                    console.warn("Status error: " + error);
+                }
+    
+                const movies = data.results;
+                console.log("Hey, new page has loaded: " + page);
+                console.log(movies);
+    
+                createMovies(nodes.genericSection, movies, {lazyLoad: true, clean: false});
+    
+                // const btnLoadMore = document.createElement('button');
+                // btnLoadMore.innerText = 'Cargar mas';
+    
+                // btnLoadMore.addEventListener('click', () => {
+                //     btnLoadMore.style.display = 'none';
+                //     getPaginatedTrendingMovies();
+                // });
+    
+    
+                // nodes.genericSection.appendChild(btnLoadMore);
+    
+            } catch (e) {
+                nodes.errorSpan.innerText = 'Ooops, algo fallo en la funcion getPaginatedTrendingMovies, error: ' + e;
+                console.warn("Error en la funcion getPaginatedTrendingMovies: " + e);
+            }
+        }
+
+    }
+
+
 }
 
 const getMovieDetailsById = async (movieId) => {
@@ -558,11 +802,11 @@ const getMovieDetailsById = async (movieId) => {
         const {data, status} = await api(`/movie/${movieId}`);
 
         // console.log("MovieId: " + movieId);
-    
+
         if (status != '200') {
             console.error("Error en status de getMovieDetailsById, status: " + status);
         }
-    
+
         const movie = data;
 
         // Generamos el link de la imagen que pondremos con el formato de theMovieDB
@@ -577,30 +821,30 @@ const getMovieDetailsById = async (movieId) => {
             // Ponemos la imagen de fondo de movieDetails
             nodes.headerSection.style.background = `
             linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
-    
+
             url(${movieImgUrl})
             `;
 
         } else {
-            
+
             // console.log("ERROR CON EL POSTER !!! ");
 
             nodes.headerSection.style.background = `
             linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
-    
+
             url(${posterPorDefecto})
             `;
-    
+
         }
 
 
 
-        
+
         // Titulo, descripcion, reviewAverage
         nodes.movieDetailTitle.innerText = movie.title;
         nodes.movieDetailDescription.innerText = movie.overview;
         nodes.movieDetailScore.innerText = movie.vote_average.toFixed(1);
-        
+
         // Obtenemos las categorias de la pelicula
         //const movieCategories = data.genres;
         //console.log(movieCategories);
@@ -665,11 +909,11 @@ const getSerieDetailsById = async (serieId) => {
     });
 
         // console.log("MovieId: " + movieId);
-    
+
         if (status != '200') {
             console.error("Error en status de getSerieDetailsById, status: " + status);
         }
-    
+
         const serie = data;
 
         // console.log(serie)
@@ -683,7 +927,7 @@ const getSerieDetailsById = async (serieId) => {
             // Ponemos la imagen de fondo de serieDetails
             nodes.headerSection.style.background = `
             linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
-    
+
             url(${serieImgUrl})
             `;
 
@@ -692,7 +936,7 @@ const getSerieDetailsById = async (serieId) => {
             // Ponemos la imagen de fondo de serieDetails
             nodes.headerSection.style.background = `
             linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
-    
+
             url(${posterPorDefecto})
             `;
 
@@ -703,7 +947,7 @@ const getSerieDetailsById = async (serieId) => {
         nodes.movieDetailTitle.innerText = serie.name;
         nodes.movieDetailDescription.innerText = serie.overview;
         nodes.movieDetailScore.innerText = serie.vote_average.toFixed(1);
-        
+
         // Obtenemos las categorias de la pelicula
         //const serieCategories = serie.genres;
         //console.log(serieCategories);
@@ -814,7 +1058,7 @@ const getRelatedMoviesFromMovieDetails = async (movieId) => {
     */
 
     // Estructura nueva
-    createMovies(nodes.relatedMoviesContainer, relatedMovies, true);
+    createMovies(nodes.relatedMoviesContainer, relatedMovies, {lazyLoad:true, clean:true});
 
 }
 
@@ -823,23 +1067,23 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
     try {
 
         const {data, status} = await api(`/tv/${serieId}/similar`);
-    
+
         if (status != '200') {
             console.warn(`Status: ${status} en funcion getRelatedSeriesFromSerieDetails`);
         }
-    
+
         const relatedSeries = data.results;
-    
+
         // Estructura vieja
         /*
-        
+
         // Limpiamos el contenedor para evitar duplicidad
         nodes.relatedMoviesContainer.innerHTML = "";
         //console.log(relatedMovies);
-    
+
         // Hacemos scroll al principio de la lista siempre
         nodes.relatedMoviesContainer.scrollTo(0,0);
-    
+
         relatedSeries.forEach(serie => {
             nodes.relatedMoviesContainer.insertAdjacentHTML('beforeend',
             `
@@ -852,36 +1096,36 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
             </div>
             `
             );
-    
-            
-    
+
+
+
             // Evento al clickear a la pelicula similar
             const movieContainer = document.querySelector(`#id${movie.id}`);
             movieContainer.addEventListener('click', () => {
                 // Sacamos el id
                 const movieId = movie.id;
-    
+
                 // Sacamos el name
                 let movieName = decodeURI(movie.title);
                 movieName = movieName.replaceAll(" ",'-');
-    
+
                 // Asignamos el hash de movieDetails
                 location.hash = `movie=${movieId}-${movieName}`;
             })
-    
-    
-    
+
+
+
         });
-    
+
         */
-    
+
         // Estructura nueva
-        createMovies(nodes.relatedMoviesContainer ,relatedSeries, true);
+        createMovies(nodes.relatedMoviesContainer ,relatedSeries, {lazyLoad:true, clean:true});
 
     } catch (e) {
         console.log('Error en funcion getRelatedSeriesFromMovieDetails: ' + e);
     }
-    
+
 
 }
 
@@ -897,6 +1141,6 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
 // pupularSeries();
 // movieCategories();
 
-export { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById};
+export { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies, getPaginatedMoviesBySearch, getPaginatedMoviesByCategory};
 
 // Test comment git

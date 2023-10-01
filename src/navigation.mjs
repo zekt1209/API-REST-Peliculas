@@ -1,5 +1,16 @@
-import { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById } from "./main.mjs";
+import { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies, getPaginatedMoviesBySearch, getPaginatedMoviesByCategory } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
+
+// Mostrar la pagina 1 por defecto cuando utilicemos paginacion en el infinite scrolling
+let page = 1;
+
+// Funcion para incrementar la pagina, llamarla desde main.js en ves de poner page++ alla, ya que cuando exportas una variable, del otro lado se recibe como const, no imprta como fue declarada, es por eso que aqui mismo hacemos la operacion que tengamos que hacer con la variable y la encapsulamos en una funcion
+const incPage = () => {
+    page++;
+}
+
+// Esta variable va a cambiar por el nombre de la funcion de paginacion dependiendo de la pagina donde estemos p.e. getPaginatedTrendingMovies
+let infiniteScrolling;
 
 
 // Eventos que manipulan al DOM para la navegacion
@@ -21,9 +32,16 @@ nodes.arrowBtn.addEventListener("click", () => {
 
 window.addEventListener("DOMContentLoaded", navigation, false);
 window.addEventListener("hashchange", navigation, false);
+window.addEventListener("scroll", infiniteScrolling, false);
 
 export default function navigation() {
     console.log ({location});
+
+    // Removemos el eventLintener de la funcion paginadora y limpiamos la variable para que despues de la navegacion, la asigne en caso de que esa pagina necesita paginacion (Mas ababo en esta funcion la volvemos a asignar)
+    if (infiniteScrolling) {
+        window.removeEventListener("scroll", infiniteScrolling, {passive: false});
+        infiniteScrolling = undefined;
+    }
 
     // Sintaxis else if con operadores ternarios
     /*
@@ -55,6 +73,10 @@ export default function navigation() {
         } 
         else {
             homePage();
+        }
+
+        if (infiniteScrolling) {
+            window.addEventListener("scroll", infiniteScrolling, {passive: false});
         }
         
 }
@@ -100,6 +122,8 @@ const trendsPage = () => {
     nodes.headerCategoryTitle.innerText = 'Tendencias';
 
     getTrendingMovies();
+
+    infiniteScrolling = getPaginatedTrendingMovies;
 };
 
 const searchPage = () => {
@@ -126,7 +150,12 @@ const searchPage = () => {
     const [_, query] = location.hash.split('='); 
     // Le ponemos el titulo buscado
     nodes.headerCategoryTitle.innerHTML = "Se muestran resultados de: " + decodeURI(query);
+
+    // Llamamos a la funcion que se encarga de hacer el llamado a la API
     getMoviesBySearch(query);
+
+    // Le asignamos a la variable infiniteScrolling el nombre de la funcion que se va a ejecutar para la paginacion
+    infiniteScrolling = getPaginatedMoviesBySearch(query);
 };
 
 const movieDetailsPage = () => {
@@ -219,6 +248,10 @@ const categoryPage = () => {
     nodes.headerCategoryTitle.innerHTML = categoryTitle;
 
     getMoviesByCategory(categoryId);
+
+    infiniteScrolling = getPaginatedMoviesByCategory(categoryId)
 };
 
 // navigation();
+
+export {page, incPage};
