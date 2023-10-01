@@ -1,8 +1,6 @@
-import { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies } from "./main.mjs";
+import { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies, getPaginatedMoviesBySearch, getPaginatedMoviesByCategory } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
 
-
-let maxPage;
 // Mostrar la pagina 1 por defecto cuando utilicemos paginacion en el infinite scrolling
 let page = 1;
 
@@ -34,14 +32,14 @@ nodes.arrowBtn.addEventListener("click", () => {
 
 window.addEventListener("DOMContentLoaded", navigation, false);
 window.addEventListener("hashchange", navigation, false);
-window.addEventListener("scroll", infiniteScrolling, {passive: false});
+window.addEventListener("scroll", infiniteScrolling, false);
 
 export default function navigation() {
     console.log ({location});
 
     // Removemos el eventLintener de la funcion paginadora y limpiamos la variable para que despues de la navegacion, la asigne en caso de que esa pagina necesita paginacion (Mas ababo en esta funcion la volvemos a asignar)
     if (infiniteScrolling) {
-        window.removeEventListener("scroll", infiniteScrolling, false);
+        window.removeEventListener("scroll", infiniteScrolling, {passive: false});
         infiniteScrolling = undefined;
     }
 
@@ -152,7 +150,12 @@ const searchPage = () => {
     const [_, query] = location.hash.split('='); 
     // Le ponemos el titulo buscado
     nodes.headerCategoryTitle.innerHTML = "Se muestran resultados de: " + decodeURI(query);
+
+    // Llamamos a la funcion que se encarga de hacer el llamado a la API
     getMoviesBySearch(query);
+
+    // Le asignamos a la variable infiniteScrolling el nombre de la funcion que se va a ejecutar para la paginacion
+    infiniteScrolling = getPaginatedMoviesBySearch(query);
 };
 
 const movieDetailsPage = () => {
@@ -245,6 +248,8 @@ const categoryPage = () => {
     nodes.headerCategoryTitle.innerHTML = categoryTitle;
 
     getMoviesByCategory(categoryId);
+
+    infiniteScrolling = getPaginatedMoviesByCategory(categoryId)
 };
 
 // navigation();

@@ -451,13 +451,6 @@ const getPaginatedTrendingMovies = async () => {
         }
     }
 
-
-
-
-
-
-
-
 }
 
 // GET para obtener las series en Tendencia
@@ -588,7 +581,7 @@ const movieCategories = async () => {
     }
 };
 
-const getMoviesByCategory = async (id, moviesByCategoryPage = 1) => {
+const getMoviesByCategory = async (id /* moviesByCategoryPage = 1 */) => {
     try {
         // Set the page we will show at the beginning in 1
 
@@ -596,7 +589,7 @@ const getMoviesByCategory = async (id, moviesByCategoryPage = 1) => {
             params: {
                 with_genres: id,
                 language: 'es-MX',
-                page: moviesByCategoryPage,
+                page
             },
         });
 
@@ -605,25 +598,95 @@ const getMoviesByCategory = async (id, moviesByCategoryPage = 1) => {
         }
 
         const movies = data.results;
+        maxPage = data.total_pages;
 
-        createMovies(nodes.genericSection, movies, {lazyLoad:true, clean: moviesByCategoryPage == 1}); // Seteamos que solo limpie si es la primera pagina
+    createMovies(nodes.genericSection, movies, {lazyLoad:true, clean: page == 1 }); // Seteamos que solo limpie si es la primera pagina
 
-        const btnLoadMore = document.createElement('button');
-        btnLoadMore.innerText = 'Cargar mas';
 
-        btnLoadMore.addEventListener('click', () => {
-            getMoviesByCategory(id, moviesByCategoryPage + 1)
-            btnLoadMore.remove();
-        });
+        /* Infinite scrolling con boton */
 
-        nodes.genericSection.appendChild(btnLoadMore);
+        // const btnLoadMore = document.createElement('button');
+        // btnLoadMore.innerText = 'Cargar mas';
 
-        //console.log(data.results);
+        // btnLoadMore.addEventListener('click', () => {
+        //     getMoviesByCategory(id, moviesByCategoryPage + 1)
+        //     btnLoadMore.remove();
+        // });
+
+        // nodes.genericSection.appendChild(btnLoadMore);
+
     } catch (error) {
         console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
         nodes.errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
     }
 };
+
+const getPaginatedMoviesByCategory = (id) => {
+
+    // let scrollTop = document.documentElement.scrollTop;
+    // let clientHeight = document.documentElement.clientHeight;
+    // let scrollHeight = document.documentElement.scrollHeight;
+
+    return async function() {
+
+        const {scrollTop,
+            clientHeight,
+            scrollHeight} = document.documentElement;
+
+            console.log("scroll in categories!");
+    
+        const scrollIsBottom = (scrollTop + clientHeight) >= (scrollHeight - 139);
+    
+        const pageInRange = page < maxPage;
+
+
+    
+        if (scrollIsBottom && pageInRange) {
+    
+            try {
+
+                // Incrementa la pagina +1
+                incPage();
+
+                const {data, status} = await api('/discover/movie', {
+                    params: {
+                        id,
+                        language: 'es-MX',
+                        page,
+                    }
+                });
+    
+                if (status != '200') {
+                    console.warn("Status error: " + error);
+                }
+    
+                const movies = data.results;
+                console.log("Hey, new page has loaded: " + page);
+                console.log(movies);
+    
+                createMovies(nodes.genericSection, movies, {lazyLoad: true, clean: false});
+    
+                // const btnLoadMore = document.createElement('button');
+                // btnLoadMore.innerText = 'Cargar mas';
+    
+                // btnLoadMore.addEventListener('click', () => {
+                //     btnLoadMore.style.display = 'none';
+                //     getPaginatedTrendingMovies();
+                // });
+    
+    
+                // nodes.genericSection.appendChild(btnLoadMore);
+    
+            } catch (e) {
+                nodes.errorSpan.innerText = 'Ooops, algo fallo en la funcion getPaginatedMoviesByCategory, error: ' + e;
+                console.warn("Error en la funcion getPaginatedMoviesByCategory: " + e);
+            }
+        }
+
+    }
+
+
+}
 
 const getMoviesBySearch = async (query, /* page = 1 */) => {
     // on theMovieDB > SEARCH > Movies
@@ -641,6 +704,9 @@ const getMoviesBySearch = async (query, /* page = 1 */) => {
         }
 
         const movies = data.results;
+
+        console.log(data.total_pages + " Pages");
+        maxPage = data.total_pages;
 
         // Checamos si no se encontro ningun resultado
         if (movies.length == 0) {
@@ -664,6 +730,71 @@ const getMoviesBySearch = async (query, /* page = 1 */) => {
         console.error("Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error);
         nodes.errorSpan.innerText = "Oooops, hubo un error al cargar esta categoria, mensaje para el desarrollador: Error en funcion getMoviesByCategory: " + error;
     }
+}
+
+const getPaginatedMoviesBySearch = (query) => {
+
+    // let scrollTop = document.documentElement.scrollTop;
+    // let clientHeight = document.documentElement.clientHeight;
+    // let scrollHeight = document.documentElement.scrollHeight;
+
+    return async function() {
+
+        const {scrollTop,
+            clientHeight,
+            scrollHeight} = document.documentElement;
+
+            console.log("scroll!!!");
+    
+        const scrollIsBottom = (scrollTop + clientHeight) >= (scrollHeight - 139);
+    
+        const pageInRange = page < maxPage;
+
+
+    
+        if (scrollIsBottom && pageInRange) {
+    
+            try {
+                // Incrementa la pagina +1
+                incPage();
+                const {data, status} = await api('/search/movie', {
+                    params: {
+                        query,
+                        language: 'es-MX',
+                        page,
+                    }
+                });
+    
+                if (status != '200') {
+                    console.warn("Status error: " + error);
+                }
+    
+                const movies = data.results;
+                console.log("Hey, new page has loaded: " + page);
+                console.log(movies);
+    
+                createMovies(nodes.genericSection, movies, {lazyLoad: true, clean: false});
+    
+                // const btnLoadMore = document.createElement('button');
+                // btnLoadMore.innerText = 'Cargar mas';
+    
+                // btnLoadMore.addEventListener('click', () => {
+                //     btnLoadMore.style.display = 'none';
+                //     getPaginatedTrendingMovies();
+                // });
+    
+    
+                // nodes.genericSection.appendChild(btnLoadMore);
+    
+            } catch (e) {
+                nodes.errorSpan.innerText = 'Ooops, algo fallo en la funcion getPaginatedTrendingMovies, error: ' + e;
+                console.warn("Error en la funcion getPaginatedTrendingMovies: " + e);
+            }
+        }
+
+    }
+
+
 }
 
 const getMovieDetailsById = async (movieId) => {
@@ -1010,6 +1141,6 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
 // pupularSeries();
 // movieCategories();
 
-export { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies};
+export { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies, getPaginatedMoviesBySearch, getPaginatedMoviesByCategory};
 
 // Test comment git
