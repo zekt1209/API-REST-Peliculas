@@ -384,6 +384,25 @@ button {
   margin: 0 0 24px 0;
 }
 
+/* Trailer Container */
+.movieDetail-trailerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-wrap: wrap;
+}
+
+.movieDetail__trailerVideo {
+  min-width: 427px;
+  min-height: 240px; 
+
+  width: 100%;
+  height: 100%;
+
+  background-color: var(--purple-light-2);
+}
+
 .relatedMovies-container {
   margin-top: 24px;
   height: 216px;

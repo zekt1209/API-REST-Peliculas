@@ -9,6 +9,7 @@ import {page, incPage} from "./navigation.mjs";
 const API_URL = "https://api.themoviedb.org/3";
 const imgUrl = "http://image.tmdb.org/t/p/w300";
 const imgUrl500 = "http://image.tmdb.org/t/p/w500";
+const youtubeBaseUrl = "https://www.youtube.com/watch?v=";
 
 let maxPage;
 
@@ -31,6 +32,7 @@ const axiosBearer = axios.create({
 // Utils
 
 const posterPorDefecto = "https://media.comicbook.com/files/img/default-movie.png";
+const trailerPorDefecto = "https://media.comicbook.com/files/img/default-movie.png";
 
 const lazyLoader = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -837,12 +839,14 @@ const getMovieDetailsById = async (movieId) => {
 
         }
 
-
-
-
-        // Titulo, descripcion, reviewAverage
+        // Titulo, descripcion, trailer, reviewAverage
         nodes.movieDetailTitle.innerText = movie.title;
         nodes.movieDetailDescription.innerText = movie.overview;
+
+
+        // Insertar aqui la funcion que maqueta el trailer
+        getMovieTrailerVideo(movieId);
+
         nodes.movieDetailScore.innerText = movie.vote_average.toFixed(1);
 
         // Obtenemos las categorias de la pelicula
@@ -1001,6 +1005,41 @@ const getSerieDetailsById = async (serieId) => {
     }
 }
 
+const getMovieTrailerVideo = async (movieId) => {
+
+    try {
+
+        const {data, status} = await api(`https://api.themoviedb.org/3/movie/${movieId}/videos`, {
+            params: {
+                language: "en-US",
+            }
+        });
+    
+        if (status != '200') {
+            console.warn("Error en status de funcion getMovieTrailerVideo, status: " + status);
+        }
+
+        const video = data.results;
+        const videoId = video[0].key;
+        // console.log(videoId);
+
+        // Validamos si la API regresa un trailer, sino ponemos una imagen por defecto
+
+        console.log(nodes.movieDetailTrailerVideo);
+        // if (videoId) {
+        //     nodes.movieDetailTrailerVideo.src = `${youtubeBaseUrl}${videoId}`;
+        // } else {
+        //     nodes.movieDetailTrailerVideo.setAttribute("src", trailerPorDefecto);
+        // }
+
+
+
+    } catch (e) {
+        console.warn("Error en funcion getMovieTrailerVideo, mensaje para el desarrollador: " + e);
+    }
+
+
+}
 
 
 

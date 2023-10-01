@@ -42,6 +42,7 @@ export const movieDetailTitle = document.querySelector(".movieDetail-title");
 export const movieDetailDescription = document.querySelector(
     ".movieDetail-description"
 );
+export const movieDetailTrailerVideo = document.querySelector(".movieDetail__trailerVideo");
 export const movieDetailScore = document.querySelector(".movieDetail-score");
 export const errorSpan = document.querySelector(".errorSpan");
 
