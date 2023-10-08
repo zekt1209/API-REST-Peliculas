@@ -928,6 +928,24 @@ const getMovieDetailsById = async (movieId) => {
         // Insertar aqui la funcion que maqueta el trailer
         getMovieTrailerVideo(movieId);
 
+        // -----------------------------------
+
+            // Creacion del boton de favoritos
+            const movieBtn = document.createElement('button');
+            movieBtn.classList.add('movie-btn');
+            movieBtn.classList.add('movieDetail_movie-btn');
+            likedMoviesListOnLocalStorage()[movie.id] && movieBtn.classList.add('movie-btn--liked');
+
+            movieBtn.addEventListener('click', () => {
+                movieBtn.classList.toggle('movie-btn--liked');
+                // DEBERIAMOS AGREGAR LA PELICULA A Local Storage
+                likedMovie(movie);
+            });
+
+            nodes.movieDetailsLikedBtn.appendChild(movieBtn);
+
+        // -----------------------------------
+
         nodes.movieDetailScore.innerText = movie.vote_average.toFixed(1);
 
         // Obtenemos las categorias de la pelicula
