@@ -13,6 +13,8 @@ const youtubeBaseUrl = "https://www.youtube.com/embed/";
 
 let maxPage;
 
+// Data
+
 // Migracion a Axios
 const api = axios.create({
     baseURL: "https://api.themoviedb.org/3",
@@ -28,6 +30,57 @@ const axiosBearer = axios.create({
         Authorization: "Bearer " + ACCESS_TOKEN,
     },
 });
+
+const likdMoviesListOnLocalStorage = () => {
+    const item = JSON.parse(localStorage.getItem('liked_movies'));
+    let movies;
+    
+    if (item) {
+        // console.log("Si hay contenido en liked_movies")
+        movies = item;
+    } else {
+        // console.log("No hay contenido en liked_movies");
+        movies = {};
+    }
+    
+    return movies;
+}
+
+const likedMovie = (movie) => {
+    let likedMoviesOnLs = likdMoviesListOnLocalStorage();
+    // console.log(likdMoviesListOnLocalStorage());
+
+
+    // Solucion del profe Juan
+    if (likedMoviesOnLs[movie.id]) {
+        // Deberiamos quitar la pelicula
+        likedMoviesOnLs[movie.id] = undefined;
+    } else {
+        // Deberiamos de agregar la pelicula
+        console.log('Deberiamos de agregar la pelicula');
+        likedMoviesOnLs[movie.id] = movie;
+        console.log(likedMoviesOnLs);
+    }
+
+    localStorage.setItem('liked_movies', JSON.stringify(likedMoviesOnLs));
+
+// Mi solucion
+    // if (likedMoviesOnLs[movie.id]) {
+    //     console.log("La pelicula si esta en LS, deberiamos eliminarla");
+
+    // } else {
+    //     console.log("La pelicula no esta en LS, deberiamos agregarla");
+    //     var likedMoviesOnLs_Stringified = JSON.stringify(likedMoviesOnLs);
+    //     console.log(likedMoviesOnLs);
+    //     if (likedMoviesOnLs_Stringified == '{}') {
+    //         // let parsedMoviesOnLs = JSON.parse(likedMoviesOnLs);
+    //         localStorage.setItem('liked_movies', `'{"${movie.id}":"${JSON.stringify(movie)}"}'`);
+    //     } else {
+    //         localStorage.setItem('liked_movies', `${likedMoviesOnLs}'{"${movie.id}":"${JSON.stringify(movie)}"}'`);
+    //     }
+    // }
+
+}
 
 // Utils
 
@@ -88,7 +141,7 @@ const createMovies = (parentContainer, dataResultArray, {lazyLoad = false, clean
 
             // console.log(poster);
 
-
+            // Ponerle el poster y activar lazyLoading
             movieImg.setAttribute(
                 lazyLoad ? "data-img" : "src",
                 `${imgUrl}${movie.poster_path}`
@@ -98,28 +151,41 @@ const createMovies = (parentContainer, dataResultArray, {lazyLoad = false, clean
             movieImg.addEventListener('error', () => {
                 movieImg.setAttribute('src', 'https://motivatevalmorgan.com/wp-content/uploads/2016/06/default-movie.jpg');
             });
+                
+            // Creacion del boton de favoritos
+            const movieBtn = document.createElement('button');
+            movieBtn.classList.add('movie-btn');
+            movieBtn.addEventListener('click', () => {
+                movieBtn.classList.toggle('movie-btn--liked');
 
+                // DEBERIAMOS AGREGAR LA PELICULA A Local Storage
+                likedMovie(movie);
+            });
+            
+            
             if (lazyLoad) {
                 lazyLoader.observe(movieImg);
             }
-
-
+            
+            
             movie_container.appendChild(movieImg);
+            movie_container.appendChild(movieBtn);
             parentContainer.appendChild(movie_container);
-
+            
             // eventListener para detalles de una pelicula
-            movie_container.addEventListener('click', () => {
+            movieImg.addEventListener('click', () => {
                 // Sacamos el id
                 const movieId = movie.id;
-
+                
                 // Sacamos el name
                 let movieName = decodeURI(movie.title);
                 movieName = movieName.replaceAll(" ",'-');
-
+                
                 // Asignamos el hash de movieDetails
                 location.hash = `movie=${movieId}-${movieName}`;
-            })
-
+            });
+            
+            
         });
 }
 

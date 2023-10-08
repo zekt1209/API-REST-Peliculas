@@ -16,6 +16,7 @@
   --lightBlue: #A2EEE5;
   --darkBlue: #8EA2EA;
   --red: #F09D9D;
+  --strong-red: #EA2027;
 
   --font-family-titles: 'Dosis', sans-serif;
   --font-family-text: 'Red Hat Display', sans-serif;
@@ -87,22 +88,22 @@ button {
   cursor: pointer;
 }
 
-
 /* Shared */
-.header-container, .trendingPreview-header, .categoriesPreview-container {
+.header-container, .trendingPreview-header, .categoriesPreview-container, .liked-header {
   padding: 0 24px;
 }
 
-.trendingPreview-container, .categoriesPreview-container, footer {
+.trendingPreview-container, .categoriesPreview-container, .liked-container, footer {
   margin-top: 48px;
 }
 
-.trendingPreview-header, .categoriesPreview-title {
+.trendingPreview-header, .categoriesPreview-title, .liked-header {
   margin-bottom: 24px;
 }
 
-.movie-container, .serie-container{
+.movie-container, .serie-container, .liked-movie-container{
   cursor: pointer;
+  position: relative;
 }
 
                           /* Loading Skeleton  */
@@ -149,9 +150,36 @@ button {
   animation-delay: .2s;
 }
 
-.movie-img, .serie-img {
+.movie-img, .serie-img, .liked-movie-img {
   border-radius: 8px;
   min-height: 370px;
+}
+
+/* Liked Button */
+.movie-btn {
+  position: absolute;
+    top: 5px;
+    right: 10px;
+
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  padding: 0;
+  margin: 0;
+}
+
+.movie-btn::before {
+  content: '🤍';
+  /* font-size: 13px; */
+}
+
+.movie-btn--liked {
+  /* background-color: var(--purple-light-2); */
+  box-shadow: 0px 0px 10px 2px var(--purple-dark-1);
+}
+
+.movie-btn--liked::before {
+  content: '❤️';
 }
 
 .categoriesPreview-list, .categories-list {
@@ -226,7 +254,7 @@ button {
 
 
 /* Trending */
-.trendingPreview-header {
+.trendingPreview-header, .liked-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -241,7 +269,8 @@ button {
                                 /* Peliculas & Series container */
 
 .trendingPreview-movieList, 
-.trendingPreview-serieList {
+.trendingPreview-serieList,
+.liked-movieList {
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
@@ -251,13 +280,15 @@ button {
 }
 
 .trendingPreview-movieList .movie-container, 
-/*.trendingPreview-serieList */.serie-container {
+/*.trendingPreview-serieList */.serie-container,
+.liked-movie-container {
   display: inline-block;
   margin-right: 8px;
 }
 
 .trendingPreview-movieList .movie-container .movie-img, 
-/*.trendingPreview-serieList .serie-container */.serie-img {
+/*.trendingPreview-serieList .serie-container */.serie-img,
+.liked-movie-img {
   height: 225px;
   min-height: 225px;
   max-height: 225px;
@@ -265,7 +296,6 @@ button {
   min-width: 150px;
   max-width: 150px;
 }
-
 
 
 /* Categories */

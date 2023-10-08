@@ -7,7 +7,7 @@ const goku = {
 const vegeta = {
     altura: "300",
     // poder: "120",
-    color_cabello: "negro",
+    color_cabello: "negroo",
 }
 
 const vegita = {...vegeta,  ...goku};
