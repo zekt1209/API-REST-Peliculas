@@ -1,4 +1,4 @@
-import { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies, getPaginatedMoviesBySearch, getPaginatedMoviesByCategory } from "./main.mjs";
+import { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies, getPaginatedMoviesBySearch, getPaginatedMoviesByCategory, getFavoriteMoviesFromLS } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
 
 // Mostrar la pagina 1 por defecto cuando utilicemos paginacion en el infinite scrolling
@@ -96,10 +96,12 @@ function homePage() {
     nodes.categoriesPreviewSection.classList.remove("inactive");
     nodes.genericSection.classList.add("inactive");
     nodes.movieDetailSection.classList.add("inactive");
+    nodes.likedMoviesSection.classList.remove("inactive");
 
     popularMovies();
     pupularSeries();
     movieCategories();
+    getFavoriteMoviesFromLS();
 }
 
 const trendsPage = () => {
@@ -117,6 +119,7 @@ const trendsPage = () => {
     nodes.categoriesPreviewSection.classList.add("inactive");
     nodes.genericSection.classList.remove("inactive");
     nodes.movieDetailSection.classList.add("inactive");
+    nodes.likedMoviesSection.classList.add("inactive");
 
     // Le ponemos el titulo a la vista de Tendencias
     nodes.headerCategoryTitle.innerText = 'Tendencias';
@@ -141,6 +144,8 @@ const searchPage = () => {
     nodes.categoriesPreviewSection.classList.add("inactive");
     nodes.genericSection.classList.remove("inactive");
     nodes.movieDetailSection.classList.add("inactive");
+    nodes.likedMoviesSection.classList.add("inactive");
+
 /*
         // #search=Spiderman
     const pageHash = location.hash.split("=");
@@ -177,7 +182,7 @@ const movieDetailsPage = () => {
     nodes.categoriesPreviewSection.classList.add("inactive");
     nodes.genericSection.classList.add("inactive");
     nodes.movieDetailSection.classList.remove("inactive");
-
+    nodes.likedMoviesSection.classList.add("inactive");
     
     const pageHash = location.hash.split("="); // -> ['#movie=', '569094-Spider-Man']
     const hashContent = pageHash[1].split("-"); // -> ['569094', 'Spider', 'Man']
@@ -206,7 +211,7 @@ const serieDetailsPage = () => {
     nodes.categoriesPreviewSection.classList.add("inactive");
     nodes.genericSection.classList.add("inactive");
     nodes.movieDetailSection.classList.remove("inactive");
-
+    nodes.likedMoviesSection.classList.add("inactive");
     
     const pageHash = location.hash.split("="); // -> ['#movie=', '569094-Spider-Man']
     const hashContent = pageHash[1].split("-"); // -> ['569094', 'Spider', 'Man']
@@ -232,6 +237,7 @@ const categoryPage = () => {
     nodes.categoriesPreviewSection.classList.add("inactive");
     nodes.genericSection.classList.remove("inactive");
     nodes.movieDetailSection.classList.add("inactive");
+    nodes.likedMoviesSection.classList.add("inactive");
 
     // #category=27-Terror
     const pageHash = location.hash.split("=");
@@ -254,4 +260,4 @@ const categoryPage = () => {
 
 // navigation();
 
-export {page, incPage};
+export {page, incPage, homePage};

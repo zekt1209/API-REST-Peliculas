@@ -3,7 +3,7 @@ import API_KEY, { ACCESS_TOKEN } from "./secrets.mjs";
 import navigation from "./navigation.mjs";
 import * as nodes from "./nodes.mjs";
 //import {num1} from './nodes.mjs';
-import {page, incPage} from "./navigation.mjs";
+import {page, incPage, homePage} from "./navigation.mjs";
 
 // const API_KEY = '17b0beeb5b0f389cd983177de5c30a80';
 const API_URL = "https://api.themoviedb.org/3";
@@ -31,7 +31,7 @@ const axiosBearer = axios.create({
     },
 });
 
-const likdMoviesListOnLocalStorage = () => {
+const likedMoviesListOnLocalStorage = () => {
     const item = JSON.parse(localStorage.getItem('liked_movies'));
     let movies;
     
@@ -47,19 +47,19 @@ const likdMoviesListOnLocalStorage = () => {
 }
 
 const likedMovie = (movie) => {
-    let likedMoviesOnLs = likdMoviesListOnLocalStorage();
+    let likedMoviesOnLs = likedMoviesListOnLocalStorage();
     // console.log(likdMoviesListOnLocalStorage());
 
 
     // Solucion del profe Juan
     if (likedMoviesOnLs[movie.id]) {
         // Deberiamos quitar la pelicula
+        console.log('Deberiamos de quitar la pelicula');
         likedMoviesOnLs[movie.id] = undefined;
     } else {
         // Deberiamos de agregar la pelicula
         console.log('Deberiamos de agregar la pelicula');
         likedMoviesOnLs[movie.id] = movie;
-        console.log(likedMoviesOnLs);
     }
 
     localStorage.setItem('liked_movies', JSON.stringify(likedMoviesOnLs));
@@ -79,6 +79,11 @@ const likedMovie = (movie) => {
     //         localStorage.setItem('liked_movies', `${likedMoviesOnLs}'{"${movie.id}":"${JSON.stringify(movie)}"}'`);
     //     }
     // }
+
+    // Funcion para recargar el home y que se actualicen las peliculas favoritas cada que se haga un cambio en esta seccion o se use esta funcion
+    if (location.hash.startsWith('#home') || !location.hash) {
+        homePage();
+    }
 
 }
 
@@ -151,10 +156,21 @@ const createMovies = (parentContainer, dataResultArray, {lazyLoad = false, clean
             movieImg.addEventListener('error', () => {
                 movieImg.setAttribute('src', 'https://motivatevalmorgan.com/wp-content/uploads/2016/06/default-movie.jpg');
             });
-                
+
+            
             // Creacion del boton de favoritos
             const movieBtn = document.createElement('button');
             movieBtn.classList.add('movie-btn');
+
+            // Mi solucion para agregarle el like rojo al cargar la pagina:
+            // const moviesOnLSObject = likedMoviesListOnLocalStorage()
+            // if (moviesOnLSObject[movie.id]) {
+            //     movieBtn.classList.add('movie-btn--liked');
+            // }
+
+            // La solucion del profe Juan:
+            likedMoviesListOnLocalStorage()[movie.id] && movieBtn.classList.add('movie-btn--liked');
+
             movieBtn.addEventListener('click', () => {
                 movieBtn.classList.toggle('movie-btn--liked');
 
@@ -1336,6 +1352,19 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
 }
 
 
+// Favorite Movies
+
+const getFavoriteMoviesFromLS = () => {
+    // Recibimos el Objeto JS con todas las peliculas que tenemos en LocalStorage parseadas previamente en likedMoviesListOnLocalStorage
+    let likedMoviesObject = likedMoviesListOnLocalStorage();
+    
+    // Convertimos a un array el objeto con las peliculas para poderselo pasar a nuestra funcion maquetadora de peliculas
+    const likedMoviesArray = Object.values(likedMoviesObject);
+
+    createMovies(nodes.likedMoviesContainer, likedMoviesArray, {lazyLoad:true, clean:true});
+}
+
+
 // --- Fetch ---
 // popularMovies(API_URL);
 // pupularSeries(API_URL);
@@ -1347,6 +1376,6 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
 // pupularSeries();
 // movieCategories();
 
-export { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies, getPaginatedMoviesBySearch, getPaginatedMoviesByCategory};
+export { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies, getPaginatedMoviesBySearch, getPaginatedMoviesByCategory, getFavoriteMoviesFromLS};
 
 // Test comment git

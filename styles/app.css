@@ -281,14 +281,14 @@ button {
 
 .trendingPreview-movieList .movie-container, 
 /*.trendingPreview-serieList */.serie-container,
-.liked-movie-container {
+.liked-movieList .movie-container {
   display: inline-block;
   margin-right: 8px;
 }
 
 .trendingPreview-movieList .movie-container .movie-img, 
 /*.trendingPreview-serieList .serie-container */.serie-img,
-.liked-movie-img {
+.liked-movieList .movie-container .movie-img {
   height: 225px;
   min-height: 225px;
   max-height: 225px;
