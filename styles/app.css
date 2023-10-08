@@ -393,15 +393,27 @@ button {
 
 .movieDetail-title {
   display: inline-block;
-  width: 80%;
+  /* width: 80%; */
+  width: 50%;
   margin: 0 0 16px 0;
   padding: 0;
+}
+
+.movieDetail_movie-btn {
+  top: 0px;
+  right: 0px;
+  
+  position: relative;
+
+  width: 45px;
+  height: 45px;
 }
 
 .movieDetail-score {
   display: inline-block;
   text-align: right;
-  width: 18%;
+  /* width: 18%; */
+  width: 1%;
   font-weight: var(--font-weight-title2);
 }
 .movieDetail-score::before {

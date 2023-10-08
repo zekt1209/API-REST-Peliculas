@@ -26,6 +26,7 @@ export const relatedMoviesContainer = document.querySelector(
 export const trendingSeriePreviewList = document.querySelector(
     ".trendingPreview-serieList"
 );
+export const movieDetailContainer = document.querySelector('.movieDetail-container');
 
 export const likedMoviesContainer = document.querySelector('.liked-movieList');
 
@@ -49,6 +50,7 @@ export const movieDetailVideoArticle = document.querySelector(".movieDetail-trai
 export const movieDetailTrailerVideo = document.querySelector(".movieDetail__trailerVideo");
 export const movieDetailScore = document.querySelector(".movieDetail-score");
 export const errorSpan = document.querySelector(".errorSpan");
+export const movieDetailsLikedBtn = document.querySelector(".movieDetail_likedBtn");
 
 let num1 = 5;
 
