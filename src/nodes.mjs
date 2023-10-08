@@ -7,6 +7,7 @@ export const categoriesPreviewSection =
     document.querySelector("#categoriesPreview");
 export const genericSection = document.querySelector("#genericList");
 export const movieDetailSection = document.querySelector("#movieDetail");
+export const likedMoviesSection = document.querySelector('#liked');
 
 // Lists & Containers
 export const searchForm = document.querySelector("#searchForm");
@@ -25,6 +26,8 @@ export const relatedMoviesContainer = document.querySelector(
 export const trendingSeriePreviewList = document.querySelector(
     ".trendingPreview-serieList"
 );
+
+export const likedMoviesContainer = document.querySelector('.liked-movieList');
 
 // Elements
 export const headerTitle = document.querySelector(".header-title");

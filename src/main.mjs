@@ -3,7 +3,7 @@ import API_KEY, { ACCESS_TOKEN } from "./secrets.mjs";
 import navigation from "./navigation.mjs";
 import * as nodes from "./nodes.mjs";
 //import {num1} from './nodes.mjs';
-import {page, incPage} from "./navigation.mjs";
+import {page, incPage, homePage} from "./navigation.mjs";
 
 // const API_KEY = '17b0beeb5b0f389cd983177de5c30a80';
 const API_URL = "https://api.themoviedb.org/3";
@@ -12,6 +12,8 @@ const imgUrl500 = "http://image.tmdb.org/t/p/w500";
 const youtubeBaseUrl = "https://www.youtube.com/embed/";
 
 let maxPage;
+
+// Data
 
 // Migracion a Axios
 const api = axios.create({
@@ -28,6 +30,62 @@ const axiosBearer = axios.create({
         Authorization: "Bearer " + ACCESS_TOKEN,
     },
 });
+
+const likedMoviesListOnLocalStorage = () => {
+    const item = JSON.parse(localStorage.getItem('liked_movies'));
+    let movies;
+    
+    if (item) {
+        // console.log("Si hay contenido en liked_movies")
+        movies = item;
+    } else {
+        // console.log("No hay contenido en liked_movies");
+        movies = {};
+    }
+    
+    return movies;
+}
+
+const likedMovie = (movie) => {
+    let likedMoviesOnLs = likedMoviesListOnLocalStorage();
+    // console.log(likdMoviesListOnLocalStorage());
+
+
+    // Solucion del profe Juan
+    if (likedMoviesOnLs[movie.id]) {
+        // Deberiamos quitar la pelicula
+        console.log('Deberiamos de quitar la pelicula');
+        likedMoviesOnLs[movie.id] = undefined;
+    } else {
+        // Deberiamos de agregar la pelicula
+        console.log('Deberiamos de agregar la pelicula');
+        likedMoviesOnLs[movie.id] = movie;
+    }
+
+    localStorage.setItem('liked_movies', JSON.stringify(likedMoviesOnLs));
+
+// Mi solucion
+    // if (likedMoviesOnLs[movie.id]) {
+    //     console.log("La pelicula si esta en LS, deberiamos eliminarla");
+
+    // } else {
+    //     console.log("La pelicula no esta en LS, deberiamos agregarla");
+    //     var likedMoviesOnLs_Stringified = JSON.stringify(likedMoviesOnLs);
+    //     console.log(likedMoviesOnLs);
+    //     if (likedMoviesOnLs_Stringified == '{}') {
+    //         // let parsedMoviesOnLs = JSON.parse(likedMoviesOnLs);
+    //         localStorage.setItem('liked_movies', `'{"${movie.id}":"${JSON.stringify(movie)}"}'`);
+    //     } else {
+    //         localStorage.setItem('liked_movies', `${likedMoviesOnLs}'{"${movie.id}":"${JSON.stringify(movie)}"}'`);
+    //     }
+    // }
+
+    // Funcion para recargar el home y que se actualicen las peliculas favoritas cada que se haga un cambio en esta seccion o se use esta funcion
+    if (location.hash.startsWith('#home') || !location.hash) {
+        homePage();
+    }
+
+}
 
 // Utils
 
@@ -88,7 +146,7 @@ const createMovies = (parentContainer, dataResultArray, {lazyLoad = false, clean
 
             // console.log(poster);
 
-
+            // Ponerle el poster y activar lazyLoading
             movieImg.setAttribute(
                 lazyLoad ? "data-img" : "src",
                 `${imgUrl}${movie.poster_path}`
@@ -99,27 +157,51 @@ const createMovies = (parentContainer, dataResultArray, {lazyLoad = false, clean
                 movieImg.setAttribute('src', 'https://motivatevalmorgan.com/wp-content/uploads/2016/06/default-movie.jpg');
             });
 
+            
+            // Creacion del boton de favoritos
+            const movieBtn = document.createElement('button');
+            movieBtn.classList.add('movie-btn');
+
+            // Mi solucion para agregarle el like rojo al cargar la pagina:
+            // const moviesOnLSObject = likedMoviesListOnLocalStorage()
+            // if (moviesOnLSObject[movie.id]) {
+            //     movieBtn.classList.add('movie-btn--liked');
+            // }
+
+            // La solucion del profe Juan:
+            likedMoviesListOnLocalStorage()[movie.id] && movieBtn.classList.add('movie-btn--liked');
+
+            movieBtn.addEventListener('click', () => {
+                movieBtn.classList.toggle('movie-btn--liked');
+
+                // DEBERIAMOS AGREGAR LA PELICULA A Local Storage
+                likedMovie(movie);
+            });
+            
+            
             if (lazyLoad) {
                 lazyLoader.observe(movieImg);
             }
-
-
+            
+            
             movie_container.appendChild(movieImg);
+            movie_container.appendChild(movieBtn);
             parentContainer.appendChild(movie_container);
-
+            
             // eventListener para detalles de una pelicula
-            movie_container.addEventListener('click', () => {
+            movieImg.addEventListener('click', () => {
                 // Sacamos el id
                 const movieId = movie.id;
-
+                
                 // Sacamos el name
                 let movieName = decodeURI(movie.title);
                 movieName = movieName.replaceAll(" ",'-');
-
+                
                 // Asignamos el hash de movieDetails
                 location.hash = `movie=${movieId}-${movieName}`;
-            })
-
+            });
+            
+            
         });
 }
 
@@ -951,7 +1033,8 @@ const getSerieDetailsById = async (serieId) => {
         nodes.movieDetailDescription.innerText = serie.overview;
 
         // FALTA consumir la API del trailer de una Serie para insertarlo aqui, de momento solo limpiamos para que no se translape con el trailer de la pelicula anterior consultada
-        nodes.movieDetailVideoArticle.innerHTML = "";
+        // nodes.movieDetailVideoArticle.innerHTML = "";
+        getSerieTrailerVideo(serieId);
 
         nodes.movieDetailScore.innerText = serie.vote_average.toFixed(1);
 
@@ -1039,6 +1122,14 @@ const getMovieTrailerVideo = async (movieId) => {
                 movieDetailsTrailer.classList.add('movieDetail__trailerVideo');
                 movieDetailsTrailer.setAttribute('frameborder', "0");
                 movieDetailsTrailer.setAttribute('allowfullscreen', true);
+
+                // Youtube video QUERY PARAMETERS, NOT ATTRIBUTES
+
+                // src format - https://www.youtube.com/embed/tgbNymZ7vqY
+                // Youtube Autoplay + Mute - ?autoplay = 1 & mute = 1
+                // Youtube Loop - loop = 1
+                // Youtube Controls - controls = 1
+
                 movieDetailsTrailer.setAttribute("src", `${youtubeBaseUrl}${videoId}`);
                 nodes.movieDetailVideoArticle.appendChild(movieDetailsTrailer);
             } else {
@@ -1063,6 +1154,70 @@ const getMovieTrailerVideo = async (movieId) => {
         console.warn("Error en funcion getMovieTrailerVideo, mensaje para el desarrollador: " + e);
     }
 
+
+}
+const getSerieTrailerVideo = async (serieId) => {
+
+    try {
+
+        const {data, status} = await api(`https://api.themoviedb.org/3/tv/${serieId}/videos`, {
+            params: {
+                language: "en-US",
+            }
+        });
+    
+        if (status != '200') {
+            console.warn("Error en status de funcion getSerieTrailerVideo, status: " + status);
+        }
+
+        const video = data.results;
+        console.log(video.length);
+
+        if (video.length > 0) {
+
+            const videoId = video[0].key;
+            // console.log(videoId);
+    
+            // Validamos si la API regresa un trailer, sino ponemos una imagen por defecto
+    
+            if (videoId) {
+                nodes.movieDetailVideoArticle.innerHTML = "";
+
+                let movieDetailsTrailer = document.createElement('iframe');
+                movieDetailsTrailer.classList.add('movieDetail__trailerVideo');
+                movieDetailsTrailer.setAttribute('frameborder', "0");
+                movieDetailsTrailer.setAttribute('allowfullscreen', true);
+
+                // Youtube video QUERY PARAMETERS, NOT ATTRIBUTES
+
+                // src format - https://www.youtube.com/embed/tgbNymZ7vqY
+                // Youtube Autoplay + Mute - ?autoplay = 1 & mute = 1
+                // Youtube Loop - loop = 1
+                // Youtube Controls - controls = 1
+
+                movieDetailsTrailer.setAttribute("src", `${youtubeBaseUrl}${videoId}`);
+                nodes.movieDetailVideoArticle.appendChild(movieDetailsTrailer);
+            } else {
+                // Limpiamos el contenedor cuando no hay trailer disponible
+                console.log("el arreglo de la api de videos no regresa nada! Limpiamos ...");
+                nodes.movieDetailVideoArticle.innerHTML = "";
+    
+                // OPCION: Creamos el elemento de la imagen que insertaremos cuando no hay trailer
+                // let noVideoImage = document.createElement('img');
+                // noVideoImage.classList.add('movieDetail__trailerVideo');
+                // noVideoImage.setAttribute('src', trailerPorDefecto);
+                // nodes.movieDetailVideoArticle.appendChild(noVideoImage);
+            }
+
+        } else {
+            nodes.movieDetailVideoArticle.innerHTML = "";
+        }
+
+
+
+    } catch (e) {
+        console.warn("Error en funcion getSerieTrailerVideo, mensaje para el desarrollador: " + e);
+    }
 
 }
 
@@ -1138,6 +1293,8 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
 
         const relatedSeries = data.results;
 
+        console.log(relatedSeries)
+
         // Estructura vieja
         /*
 
@@ -1184,13 +1341,27 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
         */
 
         // Estructura nueva
-        createMovies(nodes.relatedMoviesContainer ,relatedSeries, {lazyLoad:true, clean:true});
+        // createMovies(nodes.relatedMoviesContainer, relatedSeries, {lazyLoad:true, clean:true});
+        createSeries(nodes.relatedMoviesContainer, relatedSeries);
 
     } catch (e) {
         console.log('Error en funcion getRelatedSeriesFromMovieDetails: ' + e);
     }
 
 
+}
+
+
+// Favorite Movies
+
+const getFavoriteMoviesFromLS = () => {
+    // Recibimos el Objeto JS con todas las peliculas que tenemos en LocalStorage parseadas previamente en likedMoviesListOnLocalStorage
+    let likedMoviesObject = likedMoviesListOnLocalStorage();
+    
+    // Convertimos a un array el objeto con las peliculas para poderselo pasar a nuestra funcion maquetadora de peliculas
+    const likedMoviesArray = Object.values(likedMoviesObject);
+
+    createMovies(nodes.likedMoviesContainer, likedMoviesArray, {lazyLoad:true, clean:true});
 }
 
 
@@ -1205,6 +1376,6 @@ const getRelatedSeriesFromMovieDetails = async (serieId) => {
 // pupularSeries();
 // movieCategories();
 
-export { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies, getPaginatedMoviesBySearch, getPaginatedMoviesByCategory};
+export { popularMovies, pupularSeries, getTrendingMovies, movieCategories, getMoviesByCategory, getMoviesBySearch, getMovieDetailsById, getSerieDetailsById, getPaginatedTrendingMovies, getPaginatedMoviesBySearch, getPaginatedMoviesByCategory, getFavoriteMoviesFromLS};
 
 // Test comment git
