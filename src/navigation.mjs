@@ -1,4 +1,4 @@
-import { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch } from "./main.mjs";
+import { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch, trendingMovies } from "./main.mjs";
 import * as nodes from "./nodes.mjs";
 
 
@@ -14,6 +14,7 @@ nodes.trendingBtn.addEventListener("click", () => {
 
 nodes.arrowBtn.addEventListener("click", () => {
     console.log("Click arrow button");
+    nodes.errorSpan.innerHTML = "";
     window.history.back();
 });
 
@@ -72,6 +73,10 @@ const trendsPage = () => {
     nodes.categoriesPreviewSection.classList.add("inactive");
     nodes.genericSection.classList.remove("inactive");
     nodes.movieDetailSection.classList.add("inactive");
+
+    nodes.headerCategoryTitle.innerHTML = "Peliculas en Tendencias";
+
+    trendingMovies();
 };
 
 const searchPage = () => {
@@ -96,9 +101,10 @@ const searchPage = () => {
     const query = pageHash[1];
 */
     const [_, query] = location.hash.split('='); 
+    const queryDecoded = decodeURI(query);
     // Le ponemos el titulo buscado
-    nodes.headerCategoryTitle.innerHTML = "Se muestran resultados de: " + decodeURI(query);
-    getMoviesBySearch(query);
+    nodes.headerCategoryTitle.innerHTML = "Se muestran resultados de: " + queryDecoded;
+    getMoviesBySearch(queryDecoded);
 };
 
 const moviePage = () => {

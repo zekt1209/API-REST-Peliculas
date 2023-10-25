@@ -367,6 +367,24 @@ const getMoviesBySearch = async (query) => {
     }
 }
 
+const trendingMovies = async () => {
+    try {
+        const {data, status} = await api('trending/movie/day');
+
+        if (status != '200') {
+            console.error('Error es diferente a 200, status: ' + status);
+        }
+
+        const movies = data.results;
+
+        createMovies(nodes.genericSection, movies);
+
+    } catch (error) {
+        errorSpan.innerText = "Oooops! Algo fallo al cargar las Peliculas :( , Mensaje para el developer: " + error;
+        console.log(error);
+    }
+}
+
 
 
 // --- Fetch ---
@@ -380,6 +398,6 @@ const getMoviesBySearch = async (query) => {
 // pupularSeries();
 // movieCategories();
 
-export { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch };
+export { popularMovies, pupularSeries, movieCategories, getMoviesByCategory, getMoviesBySearch, trendingMovies };
 
 // Test comment git

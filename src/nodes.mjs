@@ -43,6 +43,7 @@ export const movieDetailDescription = document.querySelector(
     ".movieDetail-description"
 );
 export const movieDetailScore = document.querySelector(".movieDetail-score");
+export const errorSpan = document.querySelector(".errorSpan");
 
 let num1 = 5;
 
