@@ -16,6 +16,7 @@
   --lightBlue: #A2EEE5;
   --darkBlue: #8EA2EA;
   --red: #F09D9D;
+  --strong-red: #EA2027;
 
   --font-family-titles: 'Dosis', sans-serif;
   --font-family-text: 'Red Hat Display', sans-serif;
@@ -87,26 +88,98 @@ button {
   cursor: pointer;
 }
 
-
 /* Shared */
-.header-container, .trendingPreview-header, .categoriesPreview-container {
+.header-container, .trendingPreview-header, .categoriesPreview-container, .liked-header {
   padding: 0 24px;
 }
 
-.trendingPreview-container, .categoriesPreview-container, footer {
+.trendingPreview-container, .categoriesPreview-container, .liked-container, footer {
   margin-top: 48px;
 }
 
-.trendingPreview-header, .categoriesPreview-title {
+.trendingPreview-header, .categoriesPreview-title, .liked-header {
   margin-bottom: 24px;
 }
 
-.movie-container, .serie-container{
+.movie-container, .serie-container, .liked-movie-container{
   cursor: pointer;
+  position: relative;
 }
 
-.movie-img, .serie-img {
+                          /* Loading Skeleton  */
+.movie-container--loading, .serie-container--loading {
+  background: var(--purple-light-2);
   border-radius: 8px;
+  height: 225px;
+  min-height: 225px;
+  max-height: 225px;
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+  margin-bottom: 15px;
+  animation: loading-skeleton infinite 1.5s;
+}
+.movie-container--loading:nth-child(2), .serie-container--loading:nth-child(2) {
+  animation-delay: .2s;
+}
+.movie-container--loading:nth-child(3), .serie-container--loading:nth-child(3) {
+  animation-delay: .4s;
+}
+.movie-container--loading:nth-child(4), .serie-container--loading:nth-child(4) {
+  animation-delay: .6s;
+}
+.movie-container--loading:nth-child(5), .serie-container--loading:nth-child(5) {
+  animation-delay: .8s;
+}
+
+/* Movies by categories */
+.movie-container-bycategory--loading div{
+  background: var(--purple-light-2);
+  border-radius: 8px;
+  height: 309px;
+  /* min-height: 225px; */
+  /* max-height: 225px; */
+  width: 206px;
+  /* min-width: 150px; */
+  /* max-width: 150px;  */
+  margin-bottom: 15px;
+  animation: loading-skeleton infinite 1.5s;
+}
+
+.movie-container-bycategory--loading:nth-child(2) div{
+  animation-delay: .2s;
+}
+
+.movie-img, .serie-img, .liked-movie-img {
+  border-radius: 8px;
+  min-height: 370px;
+}
+
+/* Liked Button */
+.movie-btn {
+  position: absolute;
+    top: 5px;
+    right: 10px;
+
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  padding: 0;
+  margin: 0;
+}
+
+.movie-btn::before {
+  content: '🤍';
+  /* font-size: 13px; */
+}
+
+.movie-btn--liked {
+  /* background-color: var(--purple-light-2); */
+  box-shadow: 0px 0px 10px 2px var(--purple-dark-1);
+}
+
+.movie-btn--liked::before {
+  content: '❤️';
 }
 
 .categoriesPreview-list, .categories-list {
@@ -116,6 +189,8 @@ button {
   position: relative;
   flex-wrap: wrap;
 }
+
+
 
 .trendingPreview-header__series {
   margin-top: 20px;
@@ -128,8 +203,8 @@ button {
 }
 
 .header-container--long {
-  background-image: url('https://pics.filmaffinity.com/Deadpool-777527803-large.jpg');
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%), url(https://pics.filmaffinity.com/Deadpool-777527803-large.jpg);
+  /* background-image: url('https://pics.filmaffinity.com/Deadpool-777527803-large.jpg');
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%), url(https://pics.filmaffinity.com/Deadpool-777527803-large.jpg); */
   background-size: cover !important;
   height: 480px;
   position: fixed;
@@ -179,7 +254,7 @@ button {
 
 
 /* Trending */
-.trendingPreview-header {
+.trendingPreview-header, .liked-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -194,7 +269,8 @@ button {
                                 /* Peliculas & Series container */
 
 .trendingPreview-movieList, 
-.trendingPreview-serieList {
+.trendingPreview-serieList,
+.liked-movieList {
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
@@ -204,13 +280,15 @@ button {
 }
 
 .trendingPreview-movieList .movie-container, 
-.trendingPreview-serieList .serie-container {
+/*.trendingPreview-serieList */.serie-container,
+.liked-movieList .movie-container {
   display: inline-block;
   margin-right: 8px;
 }
 
 .trendingPreview-movieList .movie-container .movie-img, 
-.trendingPreview-serieList .serie-container .serie-img {
+/*.trendingPreview-serieList .serie-container */.serie-img,
+.liked-movieList .movie-container .movie-img {
   height: 225px;
   min-height: 225px;
   max-height: 225px;
@@ -220,11 +298,27 @@ button {
 }
 
 
-
 /* Categories */
 .category-container {
   width: 45%;
 }
+
+.category-container--loading div{
+  background: var(--purple-light-2);
+  border-radius: 8px;
+  height: 25px;
+  min-height: 25px;
+  max-height: 25px;
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+  margin-bottom: 15px;
+  animation: loading-skeleton infinite 1.5s;
+}
+.category-container--loading:nth-child(2) div{
+  animation-delay: .2s;
+}
+
 
 .category-title {
   margin-bottom: 8px;
@@ -293,19 +387,33 @@ button {
   z-index: 1;
   position: absolute;
   background-color: var(--purple-light-1);
+  /* Cambio para que no se buguie cuando no hay descripcion */
+  width: 100%;
 }
 
 .movieDetail-title {
   display: inline-block;
-  width: 80%;
+  /* width: 80%; */
+  width: 50%;
   margin: 0 0 16px 0;
   padding: 0;
+}
+
+.movieDetail_movie-btn {
+  top: 0px;
+  right: 0px;
+  
+  position: relative;
+
+  width: 45px;
+  height: 45px;
 }
 
 .movieDetail-score {
   display: inline-block;
   text-align: right;
-  width: 18%;
+  /* width: 18%; */
+  width: 1%;
   font-weight: var(--font-weight-title2);
 }
 .movieDetail-score::before {
@@ -316,6 +424,25 @@ button {
 
 .movieDetail-description {
   margin: 0 0 24px 0;
+}
+
+/* Trailer Container */
+.movieDetail-trailerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-wrap: wrap;
+}
+
+.movieDetail__trailerVideo {
+  min-width: 427px;
+  min-height: 240px; 
+
+  width: 100%;
+  height: 100%;
+
+  background-color: var(--purple-light-2);
 }
 
 .relatedMovies-container {
@@ -366,4 +493,14 @@ footer {
 /* Navigation */
 .inactive {
   display: none;
+}
+
+/* Animations */
+@keyframes loading-skeleton {
+  0%, 100% {
+    opacity: 100%;
+  }
+  50% {
+    opacity: 0%;
+  }
 }

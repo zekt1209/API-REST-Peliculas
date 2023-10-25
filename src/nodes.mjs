@@ -7,6 +7,7 @@ export const categoriesPreviewSection =
     document.querySelector("#categoriesPreview");
 export const genericSection = document.querySelector("#genericList");
 export const movieDetailSection = document.querySelector("#movieDetail");
+export const likedMoviesSection = document.querySelector('#liked');
 
 // Lists & Containers
 export const searchForm = document.querySelector("#searchForm");
@@ -25,6 +26,9 @@ export const relatedMoviesContainer = document.querySelector(
 export const trendingSeriePreviewList = document.querySelector(
     ".trendingPreview-serieList"
 );
+export const movieDetailContainer = document.querySelector('.movieDetail-container');
+
+export const likedMoviesContainer = document.querySelector('.liked-movieList');
 
 // Elements
 export const headerTitle = document.querySelector(".header-title");
@@ -42,8 +46,14 @@ export const movieDetailTitle = document.querySelector(".movieDetail-title");
 export const movieDetailDescription = document.querySelector(
     ".movieDetail-description"
 );
+export const movieDetailVideoArticle = document.querySelector(".movieDetail-trailerContainer");
+export const movieDetailTrailerVideo = document.querySelector(".movieDetail__trailerVideo");
 export const movieDetailScore = document.querySelector(".movieDetail-score");
 export const errorSpan = document.querySelector(".errorSpan");
+<<<<<<< HEAD
+=======
+export const movieDetailsLikedBtn = document.querySelector(".movieDetail_likedBtn");
+>>>>>>> 83dfdfc4813f98c0e24d5b21a76525a09be2289f
 
 let num1 = 5;
 
